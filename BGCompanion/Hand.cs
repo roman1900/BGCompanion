@@ -8,7 +8,7 @@ namespace BGCompanion
     {
         const int maxHandSize = 7;
         private List<Card> slots;
-        Hand()
+        public Hand()
         {
             slots = new List<Card>(maxHandSize);
         }

@@ -41,6 +41,7 @@ namespace BGCompanion
         public int Damage { get; set; }
         public int Attack { get; set; }
         public int Health { get; set; }
+        public Attribute Give { get; set; }
     }
     
 }

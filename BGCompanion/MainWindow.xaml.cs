@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace BGCompanion
 {
@@ -23,6 +25,17 @@ namespace BGCompanion
         public MainWindow()
         {
             InitializeComponent();
+            Hand hand = new Hand();
+            Card card = new Card("Selfless Hero", 2, 1, 1, Tribe.Neutral);
+            Effect buff = new Effect();
+            buff.What = Attribute.deathRattle;
+            buff.Give = Attribute.divineShield;
+            buff.Who = Tribe.self;
+            buff.Target = Tribe.friendly | Tribe.random;
+            card.AddBuff(buff);
+            string a = JsonSerializer.Serialize(card);
+
+            hand.Push(card);
         }
     }
 }
