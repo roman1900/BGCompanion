@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace BGCompanion
 {
@@ -33,9 +34,13 @@ namespace BGCompanion
             buff.Who = Tribe.self;
             buff.Target = Tribe.friendly | Tribe.random;
             card.AddBuff(buff);
-            string a = JsonSerializer.Serialize(card);
-
-            hand.Push(card);
+            string a = JsonConvert.SerializeObject(card);
+            var deserializedObject = JsonConvert.DeserializeObject<Card>(a);
+            What.ItemsSource = Enum.GetValues(typeof(Attribute));
+            Who.ItemsSource = Enum.GetValues(typeof(Tribe));
+            Deck d = new Deck();
+            d.AddCard(card);
+            d.ExportDeck(@"c:\temp\deck.json");
         }
     }
 }

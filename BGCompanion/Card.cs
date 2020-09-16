@@ -1,14 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System.Collections.Generic;
 
 namespace BGCompanion
 {
     public class Card
     {
-        public List<Effect> buffs { get; set; }
-        public int Health { get; set; }
-        public int Attack { get; set; }
-        public int Mana { get; set; }
         public string Name { get; set; }
+        public int Tier { get; set; }
+        public int Attack { get; set; }
+        public int Health { get; set; }
+        public int Mana { get; set; }
+        public List<Effect> buffs { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
         public Tribe Tribe { get; set; }
         public Card(string name,int attack, int health, int mana,Tribe tribe)
         {

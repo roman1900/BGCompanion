@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
 using System.Collections.Generic;
 
 namespace BGCompanion
@@ -34,13 +36,17 @@ namespace BGCompanion
 
     public class Effect
     {
+        [JsonConverter(typeof(StringEnumConverter))]
         public Attribute What { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
         public Tribe Who { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
         public Tribe Target { get; set; }
         public List<Card> Summons { get; set; }
         public int Damage { get; set; }
         public int Attack { get; set; }
         public int Health { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
         public Attribute Give { get; set; }
     }
     

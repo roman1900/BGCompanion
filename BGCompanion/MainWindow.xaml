@@ -6,7 +6,22 @@
         xmlns:local="clr-namespace:BGCompanion"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+
     <Grid>
+        <TextBox x:Name="cardName" HorizontalAlignment="Left" Margin="272,6,0,0" Text="Card Name" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="Tier" HorizontalAlignment="Left" Margin="272,29,0,0" Text="Tier" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="Attack" HorizontalAlignment="Left" Margin="272,52,0,0" Text="Attack" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="Health" HorizontalAlignment="Left" Margin="272,75,0,0" Text="Health" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="Mana" HorizontalAlignment="Left" Margin="272,98,0,0" Text="Mana" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <Grid Margin="5,121,5,67">
+            <TextBlock Margin="0,0,634,209">What</TextBlock>
+            <ListBox x:Name="What" Margin="0,32,649,0" SelectionMode="Multiple"/>
+            <TextBlock Margin="146,0,503,209">Who</TextBlock>
+            <ListBox x:Name="Who" Margin="146,32,503,0" SelectionMode="Multiple"/>
+
+        </Grid>
+
+
 
     </Grid>
 </Window>
