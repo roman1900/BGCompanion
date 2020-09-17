@@ -33,7 +33,16 @@ namespace BGCompanion
         Dragon      = 0b010000000000,
         all         = 0b100000000000,
     }
-
+    [Flags] public enum Race
+    {
+        Beast = 0b000000010000,
+        Demon = 0b000000100000,
+        Mech = 0b000001000000,
+        Murloc = 0b000010000000,
+        Neutral = 0b000100000000,
+        Pirate = 0b001000000000,
+        Dragon = 0b010000000000,
+    }
     public class Effect
     {
         [JsonConverter(typeof(StringEnumConverter))]

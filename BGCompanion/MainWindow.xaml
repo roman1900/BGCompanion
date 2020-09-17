@@ -5,21 +5,51 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BGCompanion"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-
+        Title="MainWindow" Height="561" Width="830">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Window.Resources>
     <Grid>
-        <TextBox x:Name="cardName" HorizontalAlignment="Left" Margin="272,6,0,0" Text="Card Name" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="Tier" HorizontalAlignment="Left" Margin="272,29,0,0" Text="Tier" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="Attack" HorizontalAlignment="Left" Margin="272,52,0,0" Text="Attack" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="Health" HorizontalAlignment="Left" Margin="272,75,0,0" Text="Health" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="Mana" HorizontalAlignment="Left" Margin="272,98,0,0" Text="Mana" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <Grid Margin="5,121,5,67">
-            <TextBlock Margin="0,0,634,209">What</TextBlock>
-            <ListBox x:Name="What" Margin="0,32,649,0" SelectionMode="Multiple"/>
-            <TextBlock Margin="146,0,503,209">Who</TextBlock>
-            <ListBox x:Name="Who" Margin="146,32,503,0" SelectionMode="Multiple"/>
+
+
+        <TextBox x:Name="cardName" HorizontalAlignment="Left" Margin="58,69,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="Tier" HorizontalAlignment="Left" Margin="58,92,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="Attack" HorizontalAlignment="Left" Margin="58,115,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="Health" HorizontalAlignment="Left" Margin="58,138,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="Mana" HorizontalAlignment="Left" Margin="58,161,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <ListBox x:Name="cardTribe" Margin="226,69,415,326"/>
+        <Grid Margin="5,178,5,10" Grid.ColumnSpan="2" Visibility="{Binding ElementName=AddEffect, Path=IsChecked, Converter={StaticResource BoolToVis}, FallbackValue=Hidden}">
+            <TextBlock Margin="0,53,679,268">What</TextBlock>
+            <ListBox x:Name="What" Margin="0,74,679,13" SelectionMode="Multiple"/>
+            <TextBlock Margin="146,53,558,260">Who</TextBlock>
+            <ListBox x:Name="Who" Margin="146,74,533,13" SelectionMode="Multiple"/>
+            <TextBlock Margin="292,53,410,249"><Run Language="en-au" Text="Target"/></TextBlock>
+            <ListBox x:Name="Target" Margin="292,74,387,13" SelectionMode="Multiple"/>
+            <TextBlock HorizontalAlignment="Left" Margin="614,76,0,0" TextWrapping="Wrap" VerticalAlignment="Top"><Run Language="en-au" Text="Damage"/></TextBlock>
+            <TextBlock HorizontalAlignment="Left" Margin="624,99,0,0" TextWrapping="Wrap" VerticalAlignment="Top"><Run Language="en-au" Text="Attack"/></TextBlock>
+            <TextBlock HorizontalAlignment="Left" Margin="624,122,0,0" TextWrapping="Wrap" VerticalAlignment="Top"><Run Language="en-au" Text="Health"/></TextBlock>
+            <TextBlock HorizontalAlignment="Left" Margin="606,145,0,0" TextWrapping="Wrap" VerticalAlignment="Top"><Run Language="en-au" Text="Summons"/></TextBlock>
+            <TextBox x:Name="effectDamage" HorizontalAlignment="Left" Margin="663,75,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+            <TextBox x:Name="effectAttack" HorizontalAlignment="Left" Margin="663,98,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+            <TextBox x:Name="effectHealth" HorizontalAlignment="Left" Margin="664,121,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+            <TextBox x:Name="effectSummons" HorizontalAlignment="Left" Margin="664,144,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+            <TextBlock Margin="438,53,269,268"><Run Language="en-au" Text="Give"/></TextBlock>
+            <ListBox x:Name="Give" Margin="438,74,235,13" SelectionMode="Multiple"/>
 
         </Grid>
+        <TextBlock HorizontalAlignment="Left" Margin="195,69,0,0" Text="Tribe" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="15,69,0,0" Text="Name" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="15,93,0,0" Text="Tier" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="15,116,0,0" Text="Attack" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="15,139,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Health"/>
+        <TextBlock HorizontalAlignment="Left" Margin="15,162,0,0" TextWrapping="Wrap" VerticalAlignment="Top"><Run Language="en-au" Text="Mana"/></TextBlock>
+        <Button x:Name="AddCard" Content="Add Card" Click="AddCard_Click" HorizontalAlignment="Left" Margin="745,70,0,0" VerticalAlignment="Top" Width="54"/>
+        <CheckBox x:Name="AddEffect" Content="Add Buff" HorizontalAlignment="Left" Margin="58,184,0,0" VerticalAlignment="Top" IsChecked="True"/>
+        <Menu Margin="0,0,0,492">
+            <MenuItem Header="_Export to file" Click="MenuExport_Click"/>
+            <MenuItem Header="_Import from file" Click="MenuImport_Click"/>
+        </Menu>
+
 
 
 

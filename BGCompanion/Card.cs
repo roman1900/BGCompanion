@@ -13,13 +13,14 @@ namespace BGCompanion
         public int Mana { get; set; }
         public List<Effect> buffs { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
-        public Tribe Tribe { get; set; }
-        public Card(string name,int attack, int health, int mana,Tribe tribe)
+        public Race Tribe { get; set; }
+        public Card(string name,int attack, int health, int mana, int tier, Race tribe)
         {
             Name = name;
             Health = health;
             Attack = attack;
             Mana = mana;
+            Tier = tier;
             Tribe = tribe;
             buffs = new List<Effect>();
         }
