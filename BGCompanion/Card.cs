@@ -14,7 +14,12 @@ namespace BGCompanion
         public List<Effect> buffs { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public Race Tribe { get; set; }
-        public Card(string name,int attack, int health, int mana, int tier, Race tribe)
+        public bool Taunt { get; set; }
+        public bool DivineShield { get; set; }
+        public bool Reborn { get; set; }
+        public bool Cleave { get; set; }
+        public bool Poisonous { get; set; }
+        public Card(string name,int attack, int health, int mana, int tier, bool taunt,bool divineshield,bool reborn,bool cleave, bool poisonous, Race tribe)
         {
             Name = name;
             Health = health;
@@ -22,6 +27,11 @@ namespace BGCompanion
             Mana = mana;
             Tier = tier;
             Tribe = tribe;
+            Taunt = taunt;
+            DivineShield = divineshield;
+            Reborn = reborn;
+            Cleave = cleave;
+            Poisonous = poisonous;
             buffs = new List<Effect>();
         }
         public void AddBuff(Effect buff)

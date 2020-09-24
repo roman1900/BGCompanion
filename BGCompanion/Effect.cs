@@ -12,10 +12,14 @@ namespace BGCompanion
         divineShield    = 0b00000010,
         poisonous       = 0b00000100,
         reborn          = 0b00001000,
-        whenEver        = 0b00010000,
-        deathRattle     = 0b00100000,
-        cleave          = 0b01000000,
-        startofcombat   = 0b10000000,
+        
+    }
+    [Flags] public enum Buffs
+    {
+        none            = 0b00000000,
+        whenEver        = 0b00000001,
+        deathRattle     = 0b00000010,
+        startOfCombat   = 0b00000100
     }
     [Flags] public enum Tribe
     {
@@ -43,20 +47,31 @@ namespace BGCompanion
         Pirate = 0b001000000000,
         Dragon = 0b010000000000,
     }
+    [Flags] public enum WheneverTrigger
+    {
+        none    = 0b000,
+        dies    = 0b001,
+        attacks = 0b010,
+        per     = 0b100,
+    }
     public class Effect
     {
         [JsonConverter(typeof(StringEnumConverter))]
-        public Attribute What { get; set; }
+        public Buffs What { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public Tribe Who { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public WheneverTrigger Trigger { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public Tribe Target { get; set; }
         public List<Card> Summons { get; set; }
         public int Damage { get; set; }
+        public bool DamagePer { get; set; }
         public int Attack { get; set; }
         public int Health { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public Attribute Give { get; set; }
+        
     }
     
 }

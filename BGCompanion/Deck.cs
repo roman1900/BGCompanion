@@ -6,12 +6,11 @@ using Newtonsoft.Json;
 
 namespace BGCompanion
 {
-    public class Deck
+    public static class Deck
     {
-        List<Card> Cards = new List<Card>();
+        public static List<Card> Cards = new List<Card>();
 
-        
-        public void ImportDeck(string filePath)
+        public static void ImportDeck(string filePath)
         {
             if (File.Exists(filePath))
             {
@@ -22,7 +21,7 @@ namespace BGCompanion
                 throw new NotImplementedException();
             }
         }
-        public void AddCard(Card card)
+        public static void AddCard(Card card)
         {
             if (Cards.Contains(card))
             {
@@ -33,7 +32,7 @@ namespace BGCompanion
                 Cards.Add(card);
             }
         }
-        public void RemoveCard(Card card)
+        public static void RemoveCard(Card card)
         {
             if (Cards.Contains(card))
             {
@@ -44,7 +43,7 @@ namespace BGCompanion
                 throw new NotImplementedException();
             }
         }
-        public void ExportDeck(string filePath)
+        public static void ExportDeck(string filePath)
         {
             string directoryName = Path.GetDirectoryName(filePath);
             if (Directory.Exists(directoryName))
