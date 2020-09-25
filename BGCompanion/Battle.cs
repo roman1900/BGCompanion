@@ -89,7 +89,7 @@ namespace BGCompanion
             else
             {
                 //do some hitting
-                //TODO: Cleave hits adjacent minions
+                //TODO(#9): Cleave hits adjacent minions
                 //TODO: Windfury 
                 //TODO: Process Whenever effects
                 //Calculate impact on attacker
