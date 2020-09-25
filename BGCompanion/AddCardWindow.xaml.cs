@@ -40,7 +40,7 @@ namespace BGCompanion
             //string a = JsonConvert.SerializeObject(card);
             //var deserializedObject = JsonConvert.DeserializeObject<Card>(a);
             Buff.ItemsSource = Enum.GetValues(typeof(Buffs));
-            //TODO: Make this disabled until whenever is selected in Buff
+            //TODO(#4): Make this disabled until whenever is selected in Buff
             Who.ItemsSource = Enum.GetValues(typeof(Tribe));
             cardTribe.ItemsSource = Enum.GetValues(typeof(Race));
             Trigger.ItemsSource = Enum.GetValues(typeof(WheneverTrigger));
