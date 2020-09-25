@@ -125,7 +125,7 @@ namespace BGCompanion
 
 
                 //TODO(#12): Process deathrattles
-                //TODO: Process reborn
+                //TODO(#13): Process reborn
                 if (_Hands[currentAttacker ^ 1].slots[target].Health <= 0)
                 {
                     if (attackQ[currentAttacker ^ 1] > target)
