@@ -91,7 +91,7 @@ namespace BGCompanion
                 //do some hitting
                 //TODO(#9): Cleave hits adjacent minions
                 //TODO(#10): Windfury 
-                //TODO: Process Whenever effects
+                //TODO(#11): Process Whenever effects
                 //Calculate impact on attacker
                 Console.WriteLine("{0} in postion {1} attacks {2} in position {3}", _Hands[currentAttacker].slots[attackQ[currentAttacker]].Name, attackQ[currentAttacker], _Hands[currentAttacker ^ 1].slots[target].Name, target);
                 if (_Hands[currentAttacker].slots[attackQ[currentAttacker]].DivineShield)
