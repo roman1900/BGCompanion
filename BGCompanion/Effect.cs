@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 namespace BGCompanion
 {
+    //TODO: Add Windfury
     [Flags] public enum Attribute
     {
         none            = 0b00000000,

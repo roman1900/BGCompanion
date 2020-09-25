@@ -70,7 +70,7 @@ namespace BGCompanion
                 val = 0;
                 Card SummonThis = Deck.Cards.Find(x => x.Name == effectSummons.Text);
                 List<Card> SummonList = new List<Card>();
-                if (SummonThis != null) // We found a matching card to ad to the summons list
+                if (!SummonThis.Equals(null)) // We found a matching card to ad to the summons list
                 {
                     if (Int32.TryParse(SummonsCount.Text, out val)) //The count of Summons we are to add
                     {

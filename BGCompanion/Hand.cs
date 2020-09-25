@@ -4,10 +4,10 @@ using System.Text;
 
 namespace BGCompanion
 {
-    class Hand
+    public class Hand
     {
-        const int maxHandSize = 7;
-        private List<Card> slots;
+        public const int maxHandSize = 7;
+        public List<Card> slots { get; set; }
         public Hand()
         {
             slots = new List<Card>(maxHandSize);
