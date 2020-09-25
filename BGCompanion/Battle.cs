@@ -61,17 +61,8 @@ namespace BGCompanion
         private static void Combat(Hand[] Hands,int[] attackQ, int currentAttacker, int target)
         {
             Hand[] _Hands = new Hand[] { new Hand(), new Hand()};
-
-            foreach (Card c in Hands[0].slots)
-            {
-                _Hands[0].slots.Add(new Card(c));
-            }
-            foreach (Card c in Hands[1].slots)
-            {
-                _Hands[1].slots.Add(new Card(c));
-            }
-            //_Hands[0].slots = new List<Card>();
-            //_Hands[1].slots = new List<Card>(Hands[1].slots);
+            _Hands[0].slots = Hands[0].slots.ConvertAll<Card>(m => new Card(m));
+            _Hands[1].slots = Hands[1].slots.ConvertAll<Card>(m => new Card(m));
             List<Card>[] Taunts = new List<Card>[] { _Hands[0].slots.FindAll(m => m.Taunt), _Hands[1].slots.FindAll(m => m.Taunt) };
             
             if (target == -1)
@@ -102,7 +93,7 @@ namespace BGCompanion
                 //TODO: Windfury 
                 //TODO: Process Whenever effects
                 //Calculate impact on attacker
-                //Console.WriteLine("{0} in postion {1} attacks {2} in position {3}", _Hands[currentAttacker].slots[attackQ[currentAttacker]].Name, attackQ[currentAttacker], _Hands[currentAttacker ^ 1].slots[target].Name, target);
+                Console.WriteLine("{0} in postion {1} attacks {2} in position {3}", _Hands[currentAttacker].slots[attackQ[currentAttacker]].Name, attackQ[currentAttacker], _Hands[currentAttacker ^ 1].slots[target].Name, target);
                 if (_Hands[currentAttacker].slots[attackQ[currentAttacker]].DivineShield)
                 {
                     _Hands[currentAttacker].slots[attackQ[currentAttacker]].DivineShield = false;
