@@ -68,7 +68,7 @@ namespace BGCompanion
             if (target == -1)
             {
                 //TODO(#6): Start of Combat effects
-                //TODO: Zapp Slywick always hits lowest attack (bypass taunt)
+                //TODO(#8): Zapp Slywick always hits lowest attack (bypass taunt)
                 if (Taunts[currentAttacker ^ 1].Count > 0) //the non attacking hands taunts
                 {
                     for (int i = 0; i < Taunts[currentAttacker ^ 1].Count; i++)
