@@ -16,6 +16,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using Newtonsoft.Json;
 using Microsoft.Win32;
+using System.Text.RegularExpressions;
 
 namespace BGCompanion
 {
@@ -106,7 +107,11 @@ namespace BGCompanion
             RaiseCustomEvent(this, new CustomEventArgs("Update"));
             this.Close();
         }
-
+        private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9]+");
+            e.Handled = regex.IsMatch(e.Text);
+        }
         
 
         private void Close_Click(object sender, RoutedEventArgs e)

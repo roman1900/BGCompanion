@@ -13,10 +13,10 @@
 
 
         <TextBox x:Name="cardName" HorizontalAlignment="Left" Margin="55,12,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="Tier" HorizontalAlignment="Left" Margin="55,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="Attack" HorizontalAlignment="Left" Margin="236,36,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="Health" HorizontalAlignment="Left" Margin="236,59,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="Mana" HorizontalAlignment="Left" Margin="55,58,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="Tier" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Margin="55,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="Attack" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Margin="236,36,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="Health" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Margin="236,59,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="Mana" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Margin="55,58,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
         <Grid Margin="2,104,8,67" Visibility="{Binding ElementName=AddEffect, Path=IsChecked, Converter={StaticResource BoolToVis}, FallbackValue=Hidden}">
             <TextBlock Margin="8,10,671,311"><Run Language="en-au" Text="Buff"/></TextBlock>
             <ListBox x:Name="Buff" Margin="8,31,671,56" SelectionMode="Single"/>
@@ -28,16 +28,16 @@
             <TextBlock HorizontalAlignment="Left" Margin="611,231,0,0" TextWrapping="Wrap" VerticalAlignment="Top"><Run Language="en-au" Text="Attack"/></TextBlock>
             <TextBlock HorizontalAlignment="Left" Margin="611,254,0,0" TextWrapping="Wrap" VerticalAlignment="Top"><Run Language="en-au" Text="Health"/></TextBlock>
             <TextBlock HorizontalAlignment="Left" Margin="593,277,0,0" TextWrapping="Wrap" VerticalAlignment="Top"><Run Language="en-au" Text="Summons"/></TextBlock>
-            <TextBox x:Name="effectDamage" HorizontalAlignment="Left" Margin="650,184,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="91"/>
-            <TextBox x:Name="effectAttack" HorizontalAlignment="Left" Margin="651,230,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="91"/>
-            <TextBox x:Name="effectHealth" HorizontalAlignment="Left" Margin="651,253,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="91"/>
+            <TextBox x:Name="effectDamage" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Margin="650,184,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="91"/>
+            <TextBox x:Name="effectAttack" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Margin="651,230,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="91"/>
+            <TextBox x:Name="effectHealth" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Margin="651,253,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="91"/>
             <TextBox x:Name="effectSummons" HorizontalAlignment="Left" Margin="651,276,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="91"/>
             <TextBlock Margin="594,10,113,311"><Run Language="en-au" Text="Give"/></TextBlock>
             <ListBox x:Name="Give" Margin="594,31,79,199" SelectionMode="Multiple"/>
             <TextBlock Margin="300,10,404,303"><Run Language="en-au" Text="Trigger"/></TextBlock>
             <ListBox x:Name="Trigger" Margin="300,31,379,56" SelectionMode="Multiple"/>
             <CheckBox x:Name="DamagePer" Content="Damage Per" HorizontalAlignment="Left" Margin="657,207,0,0" VerticalAlignment="Top"/>
-            <TextBox x:Name="SummonsCount" HorizontalAlignment="Left" Margin="651,299,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="91"/>
+            <TextBox x:Name="SummonsCount" PreviewTextInput="NumberValidationTextBox" HorizontalAlignment="Left" Margin="651,299,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="91"/>
             <TextBlock HorizontalAlignment="Left" Margin="614,299,0,0" Text="Count" TextWrapping="Wrap" VerticalAlignment="Top"/>
 
         </Grid>
