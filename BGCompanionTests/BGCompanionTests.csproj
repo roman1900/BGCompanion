@@ -17,4 +17,10 @@
     <ProjectReference Include="..\BGCompanion\BGCompanion.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="tier1.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

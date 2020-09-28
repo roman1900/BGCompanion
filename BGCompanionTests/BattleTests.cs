@@ -3,6 +3,7 @@ using BGCompanion;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 
 namespace BGCompanion.Tests
 {
@@ -14,7 +15,8 @@ namespace BGCompanion.Tests
         {
             Hand mine = new Hand();
             Hand enemy = new Hand();
-            Deck.ImportDeck(@"C:\Users\Matt\source\repos\BGCompanion\BGCompanion\bin\Debug\netcoreapp3.1\tier1.json");
+            Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
+            Deck.ImportDeck(@"tier1.json");
             Card alleyCat = Deck.Cards.Find(m => m.Name == "Alleycat");
             for (int h = 1; h <= Hand.maxHandSize; h++)
             {
@@ -65,13 +67,14 @@ namespace BGCompanion.Tests
             Console.WriteLine("Hand: 3 Alleycats vs Rockpool Hunter Win:{0} Tie:{1} Lose:{2}", Battle.winCount, Battle.tieCount, Battle.loseCount);
 
             Assert.IsTrue(true);
+            //Assert.Fail();
         }
         [TestMethod]
         public void SimulateTestNo2()
         {
             Hand mine = new Hand();
             Hand enemy = new Hand();
-            Deck.ImportDeck(@"C:\Users\Matt\source\repos\BGCompanion\BGCompanion\bin\Debug\netcoreapp3.1\tier1.json");
+            Deck.ImportDeck(@"tier1.json");
             //Card alleyCat = Deck.Cards.Find(m => m.Name == "Alleycat");
             Card rph = new Card(Deck.Cards.Find(m => m.Name == "Rockpool Hunter"));
             mine.slots = new List<Card>();
@@ -95,7 +98,7 @@ namespace BGCompanion.Tests
         {
             Hand mine = new Hand();
             Hand enemy = new Hand();
-            Deck.ImportDeck(@"C:\Users\Matt\source\repos\BGCompanion\BGCompanion\bin\Debug\netcoreapp3.1\tier1.json");
+            Deck.ImportDeck(@"tier1.json");
             //Card alleyCat = Deck.Cards.Find(m => m.Name == "Alleycat");
             Card rph = new Card(Deck.Cards.Find(m => m.Name == "Rockpool Hunter"));
             Card rp = new Card(Deck.Cards.Find(m => m.Name == "Righteous Protector"));
@@ -116,7 +119,7 @@ namespace BGCompanion.Tests
         {
             Hand mine = new Hand();
             Hand enemy = new Hand();
-            Deck.ImportDeck(@"C:\Users\Matt\source\repos\BGCompanion\BGCompanion\bin\Debug\netcoreapp3.1\tier1.json");
+            Deck.ImportDeck(@"tier1.json");
             //Card alleyCat = Deck.Cards.Find(m => m.Name == "Alleycat");
             Card rph = new Card(Deck.Cards.Find(m => m.Name == "Rockpool Hunter"));
             Card rp = new Card(Deck.Cards.Find(m => m.Name == "Righteous Protector"));
