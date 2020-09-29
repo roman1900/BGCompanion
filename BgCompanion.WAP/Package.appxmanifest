@@ -9,7 +9,7 @@
   <Identity
     Name="6da0716e-0c9f-44d1-a974-48186189d0b7"
     Publisher="O=Red Mars Consulting, C=AU"
-    Version="1.0.1.0" />
+    Version="1.0.2.0" />
 
   <Properties>
     <DisplayName>BgCompanion.WAP</DisplayName>
