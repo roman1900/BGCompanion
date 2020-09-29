@@ -66,7 +66,7 @@ namespace BGCompanion.Tests
             Battle.Simulate(mine, enemy);
             Console.WriteLine("Hand: 3 Alleycats vs Rockpool Hunter Win:{0} Tie:{1} Lose:{2}", Battle.winCount, Battle.tieCount, Battle.loseCount);
 
-            Assert.IsTrue(true);
+            Assert.IsTrue(Battle.winCount == 0 && Battle.loseCount ==0);
             //Assert.Fail();
 
         }
