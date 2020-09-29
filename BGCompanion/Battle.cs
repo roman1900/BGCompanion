@@ -206,6 +206,7 @@ namespace BGCompanion
                 {
                     combatPosition.Attacker = combatPosition.Attacker ^ 1;
                     combatPosition.Target = -1;
+                    combatPosition.Phase = CombatPhase.attack;
                     Combat(_Hands, combatPosition);
                 }
             }
