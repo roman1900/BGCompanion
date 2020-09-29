@@ -60,7 +60,7 @@ namespace BGCompanion
         }
         private static void Combat(Hand[] Hands,int[] attackQ, int currentAttacker, int target)
         {
-            //TODO: Modify Combat system so a call to Combat can jump to a particular stage of the combat ie. Attack, Reborn, Whenever, DeathRattle etc
+            //TODO(#15): Modify Combat system so a call to Combat can jump to a particular stage of the combat ie. Attack, Reborn, Whenever, DeathRattle etc
             Hand[] _Hands = new Hand[] { new Hand(), new Hand()};
             _Hands[0].slots = Hands[0].slots.ConvertAll<Card>(m => new Card(m));
             _Hands[1].slots = Hands[1].slots.ConvertAll<Card>(m => new Card(m));
