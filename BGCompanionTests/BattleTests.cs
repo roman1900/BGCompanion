@@ -68,6 +68,7 @@ namespace BGCompanion.Tests
 
             Assert.IsTrue(true);
             //Assert.Fail();
+
         }
         [TestMethod]
         public void SimulateTestNo2()
