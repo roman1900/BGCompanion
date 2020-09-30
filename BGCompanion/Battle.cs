@@ -15,13 +15,17 @@ namespace BGCompanion
             attack,
             whenever,
             reborn,
-            deathrattle
+            deathrattle,
+            startofcombat,
         }
         public struct CombatPosition
         {
             public int[] AttackQ;
             public int Attacker;
             public int Target;
+            public int AttackCount;
+            public int EffectDirectDamage;
+            public int EffectHand;
             public CombatPhase Phase;
         }
         public static void Simulate(Hand mine, Hand enemy)
@@ -55,18 +59,18 @@ namespace BGCompanion
             }
             else if (_mine.slots.Count > _enemy.slots.Count)
             {
-                Combat(new Hand[] { _mine, _enemy }, new CombatPosition { AttackQ = new int[] { 0, 0 }, Attacker = 0, Target = -1, Phase = CombatPhase.attack });
+                Combat(new Hand[] { _mine, _enemy }, new CombatPosition { AttackQ = new int[] { 0, 0 }, Attacker = 0, Target = -1, AttackCount = 0, Phase = CombatPhase.attack });
             }
             else if (_enemy.slots.Count > _mine.slots.Count)
             {
-                Combat(new Hand[] { _mine, _enemy }, new CombatPosition { AttackQ = new int[] { 0, 0 }, Attacker = 1, Target = -1, Phase = CombatPhase.attack });
+                Combat(new Hand[] { _mine, _enemy }, new CombatPosition { AttackQ = new int[] { 0, 0 }, Attacker = 1, Target = -1, AttackCount = 0, Phase = CombatPhase.attack }) ;
             }
             else
             {
-                Combat(new Hand[] { _mine, _enemy }, new CombatPosition { AttackQ = new int[] { 0, 0 }, Attacker = 0, Target = -1, Phase = CombatPhase.attack });
+                Combat(new Hand[] { _mine, _enemy }, new CombatPosition { AttackQ = new int[] { 0, 0 }, Attacker = 0, Target = -1, AttackCount = 0, Phase = CombatPhase.attack });
                 _mine.slots = new List<Card>(mine.slots);
                 _enemy.slots = new List<Card>(enemy.slots);
-                Combat(new Hand[] { _mine, _enemy }, new CombatPosition { AttackQ = new int[] { 0, 0 }, Attacker = 1, Target = -1, Phase = CombatPhase.attack });
+                Combat(new Hand[] { _mine, _enemy }, new CombatPosition { AttackQ = new int[] { 0, 0 }, Attacker = 1, Target = -1, AttackCount = 0, Phase = CombatPhase.attack });
             }
 
 
@@ -79,9 +83,85 @@ namespace BGCompanion
             _Hands[0].slots = Hands[0].slots.ConvertAll<Card>(m => new Card(m));
             _Hands[1].slots = Hands[1].slots.ConvertAll<Card>(m => new Card(m));
             List<Card>[] Taunts = new List<Card>[] { _Hands[0].slots.FindAll(m => m.Taunt), _Hands[1].slots.FindAll(m => m.Taunt) };
-            if (combatPosition.Phase == CombatPhase.attack && combatPosition.Target == -1)
+            if ((combatPosition.Phase == CombatPhase.attack && combatPosition.Target == -1) || combatPosition.Phase == CombatPhase.startofcombat)
             {
                 //TODO(#6): Start of Combat effects
+                if (combatPosition.AttackCount==0 || combatPosition.Phase == CombatPhase.startofcombat) //Start of Combat
+                {
+                    //OK need to determine start of combat order but let's assume random for now
+                    int startOCMode = 0;
+                    if (combatPosition.Phase == CombatPhase.attack)
+                    {
+                        combatPosition.Phase = CombatPhase.startofcombat;
+                        startOCMode = 1;
+                    }
+                    if (combatPosition.Phase == CombatPhase.startofcombat)
+                    {
+                        if (startOCMode == 1) //First time here
+                        {
+                            List<Card>[] Starters = new List<Card>[] { _Hands[0].slots.FindAll(m => m.buffs.Exists(b => b.What == Buffs.startOfCombat)), _Hands[1].slots.FindAll(m => m.buffs.Exists(b => b.What == Buffs.startOfCombat)) };
+
+                            //Let's assume only 1 side has a start of combat to begin with
+                            //TODO: Check if both decks have start of combat effects 
+                            if (Starters[0].Count > 0)
+                            {
+                                for (int i =0;i<Starters[0].Count;i++)
+                                {
+                                    Effect e = Starters[0][i].buffs.Find(m => m.What == Buffs.startOfCombat);
+                                    if (e.DamagePer)
+                                    {
+                                        if (e.Who.HasFlag(Tribe.friendly))
+                                        {
+                                            int count = _Hands[0].slots.FindAll(m => (Tribe)m.Tribe == (e.Who ^ Tribe.friendly)).Count;
+                                            combatPosition.EffectDirectDamage = count * e.Damage;
+                                            combatPosition.EffectHand = 0;
+                                            if (e.Target.HasFlag(Tribe.random) && e.Target.HasFlag(Tribe.enemy))
+                                            {
+                                                for(int d = 0;d < _Hands[1].slots.Count; d++ )
+                                                {
+                                                    combatPosition.Target = d;
+                                                    Combat(_Hands, combatPosition);
+                                                }
+                                            }
+                                        } 
+                                    }
+                                }
+                            }
+                            else if (Starters[1].Count > 0)
+                            {
+
+                            }
+                        }
+                        else
+                        {
+                            //doing effect
+                            //TODO: Need to process potential triggers due to start of combat damage
+                            if (_Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].DivineShield)
+                            {
+                                _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].DivineShield = false;
+                            }
+                            else
+                            {
+                                _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Health -= combatPosition.EffectDirectDamage;
+                                //Console.WriteLine("{0} in position {1} new health is {2}", _Hands[combatPosition.Attacker ^ 1].slots[target].Name,target, _Hands[combatPosition.Attacker ^ 1].slots[target].Health);
+                            }
+                            if (_Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Health <= 0)
+                            {
+                                if (combatPosition.AttackQ[combatPosition.EffectHand ^ 1] > combatPosition.Target)
+                                {
+                                    combatPosition.AttackQ[combatPosition.EffectHand ^ 1]--;
+                                }
+                                _Hands[combatPosition.EffectHand ^ 1].slots.RemoveAt(combatPosition.Target);
+                            }
+                            combatPosition.Phase = CombatPhase.attack;
+                            combatPosition.Target = -1;
+                            combatPosition.EffectDirectDamage = 0;
+                            combatPosition.AttackCount++;
+                            Combat(_Hands, combatPosition);
+                        }
+                    }
+                }
+
                 //TODO(#8): Zapp Slywick always hits lowest attack (bypass taunt)
                 if (Taunts[combatPosition.Attacker ^ 1].Count > 0) //the non attacking hands taunts
                 {
@@ -103,7 +183,7 @@ namespace BGCompanion
             }
             else
             {
-                // Do the whenever phase if startng an attack
+                // Do the whenever phase if starting an attack
                 int wheneverMode = 0;
                 if (combatPosition.Phase == CombatPhase.attack)
                 {
@@ -165,6 +245,9 @@ namespace BGCompanion
 
 
                 //TODO(#12): Process deathrattles
+
+
+
                 //TODO(#13): Process reborn
                 if (_Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target].Health <= 0)
                 {
@@ -207,6 +290,7 @@ namespace BGCompanion
                     combatPosition.Attacker = combatPosition.Attacker ^ 1;
                     combatPosition.Target = -1;
                     combatPosition.Phase = CombatPhase.attack;
+                    combatPosition.AttackCount++;
                     Combat(_Hands, combatPosition);
                 }
             }

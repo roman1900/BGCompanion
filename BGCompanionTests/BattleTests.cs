@@ -44,7 +44,7 @@ namespace BGCompanion.Tests
                     alleyCat.guid = Guid.NewGuid();
                     mine.slots.Add(alleyCat);
                 }
-                for (int i = 0; i < h-1; i++)
+                for (int i = 0; i < h - 1; i++)
                 {
                     alleyCat.guid = Guid.NewGuid();
                     enemy.slots.Add(alleyCat);
@@ -54,7 +54,7 @@ namespace BGCompanion.Tests
             }
             mine.slots = new List<Card>();
             enemy.slots = new List<Card>();
-            for (int i = 0; i<3; i++)
+            for (int i = 0; i < 3; i++)
             {
                 alleyCat.guid = new Guid();
                 mine.slots.Add(alleyCat);
@@ -66,7 +66,7 @@ namespace BGCompanion.Tests
             Battle.Simulate(mine, enemy);
             Console.WriteLine("Hand: 3 Alleycats vs Rockpool Hunter Win:{0} Tie:{1} Lose:{2}", Battle.winCount, Battle.tieCount, Battle.loseCount);
 
-            Assert.IsTrue(Battle.winCount == 0 && Battle.loseCount ==0);
+            Assert.IsTrue(Battle.winCount == 0 && Battle.loseCount == 0);
             //Assert.Fail();
 
         }
@@ -137,5 +137,21 @@ namespace BGCompanion.Tests
 
             Assert.IsTrue(Battle.loseCount == 0 && Battle.tieCount == 0 && Battle.winCount == 1);
         }
+        [TestMethod]
+        public void SimulateTestSingleRedWhelp()
+        {
+            Hand mine = new Hand();
+            Hand enemy = new Hand();
+            Deck.ImportDeck(@"tier1.json");
+            mine.slots = new List<Card>();
+            enemy.slots = new List<Card>();
+            enemy.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Alleycat")));
+            enemy.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Alleycat")));
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Red Whelp")));
+            Battle.Simulate(mine, enemy);
+            Console.WriteLine("Hand: 1 Red Whelp vs 2 Alleycat's Win:{0} Tie:{1} Lose:{2}", Battle.winCount, Battle.tieCount, Battle.loseCount);
+            Assert.IsTrue(Battle.loseCount == 0 && Battle.tieCount == 0 && Battle.winCount == 1);
+        }
+
     }
 }
