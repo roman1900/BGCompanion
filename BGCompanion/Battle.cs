@@ -103,7 +103,7 @@ namespace BGCompanion
                             List<Card>[] Starters = new List<Card>[] { _Hands[0].slots.FindAll(m => m.buffs.Exists(b => b.What == Buffs.startOfCombat)), _Hands[1].slots.FindAll(m => m.buffs.Exists(b => b.What == Buffs.startOfCombat)) };
 
                             //Let's assume only 1 side has a start of combat to begin with
-                            //TODO: Check if both decks have start of combat effects 
+                            //TODO(#18): Check if both decks have start of combat effects 
                             if (Starters[0].Count > 0)
                             {
                                 for (int i =0;i<Starters[0].Count;i++)
