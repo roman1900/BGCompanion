@@ -140,7 +140,7 @@ namespace BGCompanion
                         {
                             Console.WriteLine("Start of Combat Effects");
                             //doing effect
-                            //TODO: Need to process potential triggers due to start of combat damage
+                            //TODO(#19): Need to process potential triggers due to start of combat damage
                             if (_Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].DivineShield)
                             {
                                 _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].DivineShield = false;
