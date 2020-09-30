@@ -85,7 +85,6 @@ namespace BGCompanion
             List<Card>[] Taunts = new List<Card>[] { _Hands[0].slots.FindAll(m => m.Taunt), _Hands[1].slots.FindAll(m => m.Taunt) };
             if ((combatPosition.Phase == CombatPhase.attack && combatPosition.Target == -1) || combatPosition.Phase == CombatPhase.startofcombat)
             {
-                //TODO(#6): Start of Combat effects
                 if (combatPosition.AttackCount==0 || combatPosition.Phase == CombatPhase.startofcombat) //Start of Combat
                 {
                     //OK need to determine start of combat order but let's assume random for now
