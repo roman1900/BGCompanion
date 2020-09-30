@@ -99,6 +99,7 @@ namespace BGCompanion
                     {
                         if (startOCMode == 1) //First time here
                         {
+                            Console.WriteLine("Start of Combat");
                             List<Card>[] Starters = new List<Card>[] { _Hands[0].slots.FindAll(m => m.buffs.Exists(b => b.What == Buffs.startOfCombat)), _Hands[1].slots.FindAll(m => m.buffs.Exists(b => b.What == Buffs.startOfCombat)) };
 
                             //Let's assume only 1 side has a start of combat to begin with
@@ -107,6 +108,7 @@ namespace BGCompanion
                             {
                                 for (int i =0;i<Starters[0].Count;i++)
                                 {
+                                    Console.WriteLine("Doing Buff {0}", i);
                                     Effect e = Starters[0][i].buffs.Find(m => m.What == Buffs.startOfCombat);
                                     if (e.DamagePer)
                                     {
@@ -120,8 +122,10 @@ namespace BGCompanion
                                                 for(int d = 0;d < _Hands[1].slots.Count; d++ )
                                                 {
                                                     combatPosition.Target = d;
+                                                    Console.WriteLine("Dealing damage to {0}",d);
                                                     Combat(_Hands, combatPosition);
                                                 }
+                                                return;
                                             }
                                         } 
                                     }
@@ -134,6 +138,7 @@ namespace BGCompanion
                         }
                         else
                         {
+                            Console.WriteLine("Start of Combat Effects");
                             //doing effect
                             //TODO: Need to process potential triggers due to start of combat damage
                             if (_Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].DivineShield)
@@ -143,7 +148,7 @@ namespace BGCompanion
                             else
                             {
                                 _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Health -= combatPosition.EffectDirectDamage;
-                                //Console.WriteLine("{0} in position {1} new health is {2}", _Hands[combatPosition.Attacker ^ 1].slots[target].Name,target, _Hands[combatPosition.Attacker ^ 1].slots[target].Health);
+                                Console.WriteLine("{0} in position {1} new health is {2}", _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Name,combatPosition.Target, _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Health);
                             }
                             if (_Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Health <= 0)
                             {
@@ -157,7 +162,8 @@ namespace BGCompanion
                             combatPosition.Target = -1;
                             combatPosition.EffectDirectDamage = 0;
                             combatPosition.AttackCount++;
-                            Combat(_Hands, combatPosition);
+                            //Combat(_Hands, combatPosition);
+                            //return;
                         }
                     }
                 }
@@ -169,14 +175,14 @@ namespace BGCompanion
                     {
                         combatPosition.Target = _Hands[combatPosition.Attacker ^ 1].slots.FindIndex(m => m == Taunts[combatPosition.Attacker ^ 1][i]);
                         Combat(_Hands, combatPosition);
-
                     }
                 }
                 else
                 {
-                    for (int i = 0; i < _Hands[combatPosition.Attacker ^ 1].slots.Count; i++)
+                    for (int targetposition = 0; targetposition < _Hands[combatPosition.Attacker ^ 1].slots.Count; targetposition++)
                     {
-                        combatPosition.Target = i;
+                        Console.WriteLine("{0} is attacking {1}", combatPosition.Attacker, targetposition);
+                        combatPosition.Target = targetposition;
                         Combat(_Hands, combatPosition);
                     }
                 }
@@ -282,6 +288,7 @@ namespace BGCompanion
                     }
                     else
                     {
+                        Console.WriteLine("We Won");
                         winCount++;
                     }
                 }

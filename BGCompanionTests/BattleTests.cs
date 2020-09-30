@@ -150,7 +150,7 @@ namespace BGCompanion.Tests
             mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Red Whelp")));
             Battle.Simulate(mine, enemy);
             Console.WriteLine("Hand: 1 Red Whelp vs 2 Alleycat's Win:{0} Tie:{1} Lose:{2}", Battle.winCount, Battle.tieCount, Battle.loseCount);
-            Assert.IsTrue(Battle.loseCount == 0 && Battle.tieCount == 0 && Battle.winCount == 1);
+            Assert.IsTrue(Battle.loseCount == 0 && Battle.tieCount == 0 && Battle.winCount == 2);
         }
 
     }
