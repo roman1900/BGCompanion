@@ -229,13 +229,13 @@ namespace BGCompanion
                         }
 
 
-                        //else
-                        //{
+                        else
+                        {
                             combatPosition.Phase = CombatPhase.attack;
                             combatPosition.Target = -1;
                             combatPosition.EffectDirectDamage = 0;
-                        Combat(_Hands, combatPosition);
-                        //}
+                            Combat(_Hands, combatPosition);
+                        }
                     }
                     else //We are doing to effect
                     {
