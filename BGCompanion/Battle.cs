@@ -10,6 +10,11 @@ namespace BGCompanion
         public static int winCount;
         public static int loseCount;
         public static int totalBattles;
+        public enum Who
+        {
+            Player = 0,
+            Enemy = 1
+        }
         public enum CombatPhase
         {
             attack,
@@ -69,114 +74,27 @@ namespace BGCompanion
                 cp.AttackCount = 0;
                 cp.AttackQ = new int[] { 0, 0 };
                 cp.EffectQ = new int[] { 0, 0 };
-                if (_mine.slots.Count > _enemy.slots.Count)
-                {
-                    cp.Attacker = 0;
-                }
-                else if (_enemy.slots.Count > _mine.slots.Count)
-                {
-                    cp.Attacker = 1;
-                }
-                else
-                {
-                    cp.Attacker = -1;
-                }
-
-
+                Console.WriteLine("The Player's hand has {0} cards. Enemy Hand has {1} cards.", _mine.slots.Count, _enemy.slots.Count);
+                cp.Attacker = (_mine.slots.Count > _enemy.slots.Count) ? 0 : (_enemy.slots.Count > _mine.slots.Count) ? 1 : -1;
                 cp.Phase = (startmine || startenemy) ? CombatPhase.startofcombat : CombatPhase.attack;
-
-                if (cp.Phase.HasFlag(CombatPhase.startofcombat))
+                bool alternateSOC = startenemy && startmine;
+                int[] attackbounds = new int[] { cp.Attacker == -1 ? 0 : cp.Attacker, cp.Attacker == -1 ? 1 : cp.Attacker };
+                
+                for (int attackorder = attackbounds[0]; attackorder <= attackbounds[1]; attackorder++  )
                 {
-                    if (startmine)
+                    Console.WriteLine("{0} is attacking.", (Who)attackorder);
+                    cp.Attacker = attackorder;
+                    for (int startofcombatorder = alternateSOC ? 0 : startenemy ? 1 : 0; startofcombatorder <= (startenemy ? 1 : 0); startofcombatorder++)
                     {
-                        if (startenemy) //Both players have start of combat effects
-                        {
-                            cp.EffectHand = 0;
-                            if (cp.Attacker == -1)
-                            {
-                                cp.Attacker = 0;
-                                Combat(new Hand[] { _mine, _enemy }, cp);
-                                cp.Attacker = 1;
-                                _mine.slots = new List<Card>(mine.slots);
-                                _enemy.slots = new List<Card>(enemy.slots);
-                                Combat(new Hand[] { _mine, _enemy }, cp);
-                            }
-                            else
-                            {
-                                Combat(new Hand[] { _mine, _enemy }, cp);
-                            }
-                            cp.EffectHand = 1;
-                            if (cp.Attacker == -1)
-                            {
-                                cp.Attacker = 0;
-                                Combat(new Hand[] { _mine, _enemy }, cp);
-                                cp.Attacker = 1;
-                                _mine.slots = new List<Card>(mine.slots);
-                                _enemy.slots = new List<Card>(enemy.slots);
-                                Combat(new Hand[] { _mine, _enemy }, cp);
-                            }
-                            else
-                            {
-                                Combat(new Hand[] { _mine, _enemy }, cp);
-                            }
-                        }
-                        else
-                        {
-                            cp.EffectHand = 0;
-                            if (cp.Attacker == -1)
-                            {
-                                cp.Attacker = 0;
-                                Combat(new Hand[] { _mine, _enemy }, cp);
-                                cp.Attacker = 1;
-                                _mine.slots = new List<Card>(mine.slots);
-                                _enemy.slots = new List<Card>(enemy.slots);
-                                Combat(new Hand[] { _mine, _enemy }, cp);
-                            }
-                            else
-                            {
-                                Combat(new Hand[] { _mine, _enemy }, cp);
-                            }
-                        }
-                    }
-                    else if (startenemy)
-                    {
-                        cp.EffectHand = 0;
-                        if (cp.Attacker == -1)
-                        {
-                            cp.Attacker = 0;
-                            Combat(new Hand[] { _mine, _enemy }, cp);
-                            cp.Attacker = 1;
-                            _mine.slots = new List<Card>(mine.slots);
-                            _enemy.slots = new List<Card>(enemy.slots);
-                            Combat(new Hand[] { _mine, _enemy }, cp);
-                        }
-                        else
-                        {
-                            Combat(new Hand[] { _mine, _enemy }, cp);
-                        }
-                    }
+                        cp.EffectHand = startofcombatorder;
 
-                }
-                else
-                {
-                    if (cp.Attacker == -1)
-                    {
-                        cp.Attacker = 0;
-                        Combat(new Hand[] { _mine, _enemy }, cp);
-                        cp.Attacker = 1;
+                        if (cp.Phase == CombatPhase.startofcombat) Console.WriteLine("Start of Combat triggering for {0}", (Who)startofcombatorder);
                         _mine.slots = new List<Card>(mine.slots);
                         _enemy.slots = new List<Card>(enemy.slots);
                         Combat(new Hand[] { _mine, _enemy }, cp);
                     }
-                    else
-                    {
-                        Combat(new Hand[] { _mine, _enemy }, cp);
-                    }
                 }
-
             }
-
-
         }
         private static void DoEffect()
         {
@@ -197,6 +115,30 @@ namespace BGCompanion
             List<Card>[] _Starters = { new List<Card>(), new List<Card>() };
             _Starters[0] = _Hands[0].slots.FindAll(m => m.buffs.Exists(b => b.What == Buffs.startOfCombat));
             _Starters[1] = _Hands[1].slots.FindAll(m => m.buffs.Exists(b => b.What == Buffs.startOfCombat));
+            //Is this battle over?
+            if (_Hands[0].slots.Count == 0 || _Hands[1].slots.Count == 0)
+            {
+                totalBattles++;
+                if (_Hands[0].slots.Count == 0)
+                {
+                    if (_Hands[1].slots.Count == 0)
+                    {
+                        tieCount++;
+                        return;
+                    }
+                    else
+                    {
+                        loseCount++;
+                        return;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("We Won");
+                    winCount++;
+                    return;
+                }
+            }
             switch (combatPosition.Phase)
             {
                 case CombatPhase.startofcombat:
@@ -205,7 +147,7 @@ namespace BGCompanion
                         if (_Starters[combatPosition.EffectHand].Count > 0)
                         {
                             Card c = _Starters[combatPosition.EffectHand][0];
-                            Console.WriteLine("Doing Buff {0}", _Hands[combatPosition.EffectHand].slots.FindIndex(m => m.guid == c.guid));
+                            Console.WriteLine("{1} is doing Buff {0}", _Hands[combatPosition.EffectHand].slots.FindIndex(m => m.guid == c.guid),(Who)combatPosition.EffectHand);
                             Effect e = c.buffs.Find(m => m.What == Buffs.startOfCombat);
                             if (e.DamagePer)
                             {
@@ -262,6 +204,9 @@ namespace BGCompanion
                         //combatPosition.Target = -1;
                         combatPosition.EffectDirectDamage = 0;
                         combatPosition.AttackCount++;
+                        //combatPosition.EffectHand = _Starters[combatPosition.EffectHand ^ 1].Count > 0 ? combatPosition.EffectHand ^ 1 : combatPosition.EffectHand;
+                        //One Hand performs all start of combat effects before the other
+                        combatPosition.EffectHand = _Starters[combatPosition.EffectHand].Count > 0 ? combatPosition.EffectHand : combatPosition.EffectHand ^ 1;
                         Combat(_Hands, combatPosition);
                     }
                     break;

@@ -166,7 +166,23 @@ namespace BGCompanion.Tests
             mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Red Whelp")));
             Battle.Simulate(mine, enemy);
             Console.WriteLine("Hand: 1 Red Whelp vs 2 Alleycat's Win:{0} Tie:{1} Lose:{2}", Battle.winCount, Battle.tieCount, Battle.loseCount);
-            Assert.IsTrue(Battle.loseCount == 0 && Battle.tieCount == 0 && Battle.winCount == 2);
+            Assert.IsTrue(Battle.loseCount == 0 && Battle.tieCount == 0 && Battle.winCount == 4);
+        }
+        [TestMethod]
+        public void SimulateTestTwoRedWhelpsVTwoRedWhelps()
+        {
+            Hand mine = new Hand();
+            Hand enemy = new Hand();
+            Deck.ImportDeck(@"tier1.json");
+            mine.slots = new List<Card>();
+            enemy.slots = new List<Card>();
+            enemy.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Red Whelp")));
+            enemy.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Red Whelp")));
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Red Whelp")));
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Red Whelp")));
+            Battle.Simulate(mine, enemy);
+            Console.WriteLine("Hand: 1 Red Whelp vs 2 Alleycat's Win:{0} Tie:{1} Lose:{2}", Battle.winCount, Battle.tieCount, Battle.loseCount);
+            Assert.IsTrue(Battle.loseCount == 4 && Battle.tieCount == 0 && Battle.winCount == 4);
         }
 
     }
