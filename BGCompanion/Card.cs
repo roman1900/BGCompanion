@@ -44,7 +44,7 @@ namespace BGCompanion
             Attack = c.Attack;
             Health = c.Health;
             Mana = c.Mana;
-            buffs = c.buffs;
+            buffs = c.buffs.ConvertAll<Effect>(m => new Effect(m));
             Tribe = c.Tribe;
             Taunt = c.Taunt;
             DivineShield = c.DivineShield;

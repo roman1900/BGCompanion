@@ -57,6 +57,25 @@ namespace BGCompanion
     }
     public class Effect
     {
+       
+        public Effect()
+        {
+
+        }
+        public Effect(Effect m)
+        {
+            What = m.What;
+            Who = m.Who;
+            Trigger = m.Trigger;
+            Target = m.Target;
+            if (m.Summons != null) { m.Summons.ConvertAll<Card>(s => new Card(s)); }
+            Damage = m.Damage;
+            DamagePer = m.DamagePer;
+            Attack = m.Attack;
+            Health = m.Health;
+            Give = m.Give;
+        }
+
         [JsonConverter(typeof(StringEnumConverter))]
         public Buffs What { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
