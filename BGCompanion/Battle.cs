@@ -125,7 +125,6 @@ namespace BGCompanion
         }
         private static void Combat(Hand[] Hands, CombatPosition combatPosition)//int[] attackQ, int combatPosition.Attacker, int target)
         {
-            //TODO(#15): Modify Combat system so a call to Combat can jump to a particular stage of the combat ie. Attack, Reborn, Whenever, DeathRattle etc
 
 
             //First step copy the classes passed via parameter so we do not modify the originals 
