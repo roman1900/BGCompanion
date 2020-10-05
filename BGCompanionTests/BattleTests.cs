@@ -66,7 +66,7 @@ namespace BGCompanion.Tests
             Battle.Simulate(mine, enemy);
             Console.WriteLine("Hand: 3 Alleycats vs Rockpool Hunter Win:{0} Tie:{1} Lose:{2}", Battle.winCount, Battle.tieCount, Battle.loseCount);
 
-            Assert.IsTrue(Battle.winCount == 0 && Battle.loseCount == 0);
+            Assert.IsTrue(Battle.winPerc == 0 && Battle.losePerc == 0 && Battle.tiePerc == 1);
             //Assert.Fail();
 
         }
@@ -92,7 +92,7 @@ namespace BGCompanion.Tests
             Battle.Simulate(mine, enemy);
             Console.WriteLine("Hand: 3 Alleycats vs Rockpool Hunter Win:{0} Tie:{1} Lose:{2}", Battle.winCount, Battle.tieCount, Battle.loseCount);
 
-            Assert.IsTrue(Battle.loseCount == 0 && Battle.tieCount == 2 && Battle.winCount == 0);
+            Assert.IsTrue(Battle.winPerc == 0 && Battle.losePerc == 0 && Battle.tiePerc == 1);
         }
         [TestMethod]
         public void SimulateTestDivineShieldTaunt()
@@ -113,7 +113,8 @@ namespace BGCompanion.Tests
             Battle.Simulate(mine, enemy);
             Console.WriteLine("Hand: 3 Alleycats vs Rockpool Hunter Win:{0} Tie:{1} Lose:{2}", Battle.winCount, Battle.tieCount, Battle.loseCount);
 
-            Assert.IsTrue(Battle.loseCount == 0 && Battle.tieCount == 1 && Battle.winCount == 0);
+           
+            Assert.IsTrue(Battle.winPerc == 0 && Battle.losePerc == 0 && Battle.tiePerc == 1);
         }
         [TestMethod]
         public void SimulateTestTauntOutOfPosition()
@@ -135,7 +136,8 @@ namespace BGCompanion.Tests
             Battle.Simulate(mine, enemy);
             Console.WriteLine("Hand: 3 Alleycats vs Rockpool Hunter Win:{0} Tie:{1} Lose:{2}", Battle.winCount, Battle.tieCount, Battle.loseCount);
 
-            Assert.IsTrue(Battle.loseCount == 0 && Battle.tieCount == 0 && Battle.winCount == 1);
+            
+            Assert.IsTrue(Battle.winPerc == 1 && Battle.losePerc == 0 && Battle.tiePerc == 0);
         }
         [TestMethod]
         public void SimulateTestSingleRedWhelp()
@@ -150,7 +152,8 @@ namespace BGCompanion.Tests
             mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Red Whelp")));
             Battle.Simulate(mine, enemy);
             Console.WriteLine("Hand: 1 Red Whelp vs 2 Alleycat's Win:{0} Tie:{1} Lose:{2}", Battle.winCount, Battle.tieCount, Battle.loseCount);
-            Assert.IsTrue(Battle.loseCount == 0 && Battle.tieCount == 0 && Battle.winCount == 2);
+            
+            Assert.IsTrue(Battle.winPerc == 1 && Battle.losePerc == 0 && Battle.tiePerc == 0);
         }
         [TestMethod]
         public void SimulateTestTwoRedWhelps()
@@ -166,7 +169,8 @@ namespace BGCompanion.Tests
             mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Red Whelp")));
             Battle.Simulate(mine, enemy);
             Console.WriteLine("Hand: 1 Red Whelp vs 2 Alleycat's Win:{0} Tie:{1} Lose:{2}", Battle.winCount, Battle.tieCount, Battle.loseCount);
-            Assert.IsTrue(Battle.loseCount == 0 && Battle.tieCount == 0 && Battle.winCount == 4);
+            
+            Assert.IsTrue(Battle.winPerc == 1 && Battle.losePerc == 0 && Battle.tiePerc == 0);
         }
         [TestMethod]
         public void SimulateTestTwoRedWhelpsVTwoRedWhelps()
@@ -182,8 +186,26 @@ namespace BGCompanion.Tests
             mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Red Whelp")));
             Battle.Simulate(mine, enemy);
             Console.WriteLine("Hand: 1 Red Whelp vs 2 Alleycat's Win:{0} Tie:{1} Lose:{2}", Battle.winCount, Battle.tieCount, Battle.loseCount);
-            Assert.IsTrue(Battle.loseCount == 4 && Battle.tieCount == 0 && Battle.winCount == 4);
+            
+            Assert.IsTrue(Battle.winPerc == .5 && Battle.losePerc == .5 && Battle.tiePerc == 0);
         }
+        [TestMethod]
+        public void SimulateTest2RWv2RWand1AC()
+        {
+            Hand mine = new Hand();
+            Hand enemy = new Hand();
+            Deck.ImportDeck(@"tier1.json");
+            mine.slots = new List<Card>();
+            enemy.slots = new List<Card>();
+            enemy.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Alleycat")));
+            enemy.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Red Whelp")));
+            enemy.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Red Whelp")));
 
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Red Whelp")));
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Red Whelp")));
+            Battle.Simulate(mine, enemy);
+            //Console.WriteLine("Results Win:{0} Tie:{1} Lose:{2}", Battle.winCount, Battle.tieCount, Battle.loseCount);
+            Assert.IsTrue(Battle.winPerc == .50 && Battle.tiePerc == 0 && Battle.losePerc == .50);
+        }
     }
 }
