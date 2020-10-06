@@ -40,7 +40,7 @@
     "Tribe": "Mech",
     "Taunt": false,
     "DivineShield": false,
-    "Reborn": false,
+    "Reborn": true,
     "Cleave": false,
     "Poisonous": false
   },

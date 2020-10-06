@@ -207,5 +207,19 @@ namespace BGCompanion.Tests
             //Console.WriteLine("Results Win:{0} Tie:{1} Lose:{2}", Battle.winCount, Battle.tieCount, Battle.loseCount);
             Assert.IsTrue(Battle.winPerc == .50 && Battle.tiePerc == 0 && Battle.losePerc == .50);
         }
+        [TestMethod]
+        public void SimulateTest1MicroMv1DeckS()
+        {
+            Hand mine = new Hand();
+            Hand enemy = new Hand();
+            Deck.ImportDeck(@"tier1.json");
+            mine.slots = new List<Card>();
+            enemy.slots = new List<Card>();
+            enemy.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Micro Mummy")));
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Deck Swabbie")));
+            Battle.Simulate(mine, enemy);
+            Assert.IsTrue(Battle.winPerc == 0 && Battle.tiePerc == 1 && Battle.losePerc == 0);
+        }
+
     }
 }

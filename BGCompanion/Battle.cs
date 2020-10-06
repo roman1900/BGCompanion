@@ -222,7 +222,24 @@ namespace BGCompanion
                             {
                                 combatPosition.AttackQ[combatPosition.EffectHand ^ 1]--;
                             }
-                            _Hands[combatPosition.EffectHand ^ 1].slots.RemoveAt(combatPosition.Target);
+                            //Reborn check 
+                            //TODO: Deathrattles trigger first so there may not be any room for the reborn minion
+                            
+                            
+                            if (_Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Reborn)
+                            {
+                                var cardName = _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Name;
+                                _Hands[combatPosition.EffectHand ^ 1].slots.RemoveAt(combatPosition.Target);
+                                _Hands[combatPosition.EffectHand ^ 1].slots.Insert(combatPosition.Target, new Card(Deck.Cards.Find(m => m.Name == cardName)));
+                                _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Reborn = false;
+                                _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Health = 1;
+                            }
+                            else
+                            {
+                                _Hands[combatPosition.EffectHand ^ 1].slots.RemoveAt(combatPosition.Target);
+                            }
+
+
                         }
                         //combatPosition.Phase = CombatPhase.attack;
                         //combatPosition.Target = -1;
@@ -250,7 +267,7 @@ namespace BGCompanion
                         {
                             for (int targetposition = 0; targetposition < _Hands[combatPosition.Attacker ^ 1].slots.Count; targetposition++)
                             {
-                                PrintHand(_Hands,combatPosition);
+                                //PrintHand(_Hands,combatPosition);
                                 Console.WriteLine("{0} is attacking {1}", combatPosition.Attacker, targetposition);
                                 combatPosition.Target = targetposition;
                                 Combat(_Hands, combatPosition);
@@ -331,12 +348,12 @@ namespace BGCompanion
                             {
                                 combatPosition.AttackQ[combatPosition.Attacker ^ 1]--;
                             }
-                            _Hands[combatPosition.Attacker ^ 1].slots.RemoveAt(combatPosition.Target);
+                            ProcessReborn(_Hands[combatPosition.Attacker ^ 1], combatPosition.Target);
+                            //_Hands[combatPosition.Attacker ^ 1].slots.RemoveAt(combatPosition.Target);
                         }
                         if (_Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].Health <= 0)
                         {
-                            //Console.WriteLine("removing {0} at postion {1} from hand", _Hands[combatPosition.Attacker].slots[attackQ[combatPosition.Attacker]].Name, attackQ[combatPosition.Attacker]);
-                            _Hands[combatPosition.Attacker].slots.RemoveAt(combatPosition.AttackQ[combatPosition.Attacker]);
+                            ProcessReborn(_Hands[combatPosition.Attacker], combatPosition.AttackQ[combatPosition.Attacker]);
                         }
                         else
                         {
@@ -381,7 +398,21 @@ namespace BGCompanion
             
 
         }
-
+        private static void ProcessReborn(Hand hand, int target)
+        {
+            if (hand.slots[target].Reborn)
+            {
+                var cardName = hand.slots[target].Name;
+                hand.slots.RemoveAt(target);
+                hand.slots.Insert(target, new Card(Deck.Cards.Find(m => m.Name == cardName)));
+                hand.slots[target].Reborn = false;
+                hand.slots[target].Health = 1;
+            }
+            else
+            {
+                hand.slots.RemoveAt(target);
+            }
+        }
         private static void PrintHand(Hand[] Hands, CombatPosition cp)
         {
             int ColWidth = 25;// Hands[0].slots.Max(m => m.Name.Length);
