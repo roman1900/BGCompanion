@@ -225,21 +225,7 @@ namespace BGCompanion
                             //Reborn check 
                             //TODO(#24): Deathrattles trigger first so there may not be any room for the reborn minion
 
-
-                            if (_Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Reborn)
-                            {
-                                var cardName = _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Name;
-                                _Hands[combatPosition.EffectHand ^ 1].slots.RemoveAt(combatPosition.Target);
-                                _Hands[combatPosition.EffectHand ^ 1].slots.Insert(combatPosition.Target, new Card(Deck.Cards.Find(m => m.Name == cardName)));
-                                _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Reborn = false;
-                                _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Health = 1;
-                            }
-                            else
-                            {
-                                _Hands[combatPosition.EffectHand ^ 1].slots.RemoveAt(combatPosition.Target);
-                            }
-
-
+                            ProcessReborn(_Hands[combatPosition.EffectHand ^ 1], combatPosition.Target);
                         }
                         //combatPosition.Phase = CombatPhase.attack;
                         //combatPosition.Target = -1;
@@ -282,9 +268,9 @@ namespace BGCompanion
                         List<Card> wheneverAttacks = new List<Card>(_Hands[combatPosition.Attacker].slots.FindAll(m => m.buffs.Exists(b => b.What == Buffs.whenEver && b.Trigger == WheneverTrigger.attacks)));
                         for (int i = 0; i < wheneverAttacks.Count; i++)
                         {
+                            //self buff attack
                             if (wheneverAttacks[i].buffs.Exists(m => m.Who == Tribe.self) && wheneverAttacks[i].guid == _Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].guid)
                             {
-                                //self buff attack
                                 _Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].Attack += wheneverAttacks[i].buffs.Find(m => m.Who == Tribe.self).Attack;
                             }
                         }
@@ -333,7 +319,9 @@ namespace BGCompanion
 
                         if (_Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target].Health <= 0)
                         {
-                            
+                            //WORKING HERE
+                            //_Hands[combatPosition.Attacker ^ 1].slots.FindAll
+                            ProcessWheneverDies(_Hands[combatPosition.Attacker ^ 1], combatPosition.Target);
 
                             ProcessReborn(_Hands[combatPosition.Attacker ^ 1], combatPosition.Target);
                             if (combatPosition.AttackQ[combatPosition.Attacker ^ 1] > combatPosition.Target)
@@ -380,7 +368,7 @@ namespace BGCompanion
                         }
                         else
                         {
-                            combatPosition.Attacker = combatPosition.Attacker ^ 1;
+                            combatPosition.Attacker ^= 1;
                             combatPosition.Target = -1;
                             combatPosition.Phase = CombatPhase.attack;
                             combatPosition.AttackCount++;
@@ -397,6 +385,15 @@ namespace BGCompanion
 
 
         }
+
+        private static void ProcessWheneverDies(Hand hand, int target)
+        {
+            //hand.slots.ForEach(m => m.buffs.Exists(b => b.What == Buffs.whenEver && b.Who.HasFlag(Tribe.friendly) && b.Trigger == WheneverTrigger.dies)))
+            //{
+            //    //if (hand.slots[target].Tribe & )
+            //}
+        }
+
         private static void ProcessReborn(Hand hand, int target)
         {
             if (hand.slots[target].Reborn)
@@ -412,6 +409,7 @@ namespace BGCompanion
                 hand.slots.RemoveAt(target);
             }
         }
+
         private static void PrintHand(Hand[] Hands, CombatPosition cp)
         {
             int ColWidth = 25;// Hands[0].slots.Max(m => m.Name.Length);
