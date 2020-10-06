@@ -55,7 +55,7 @@ namespace BGCompanion
 
         private void AddCard_Click(object sender, RoutedEventArgs e)
         {
-            //TODO: Enforce Tribe Selection on Add Card Window
+            //TODO(#23): Enforce Tribe Selection on Add Card Window
             Card card = new Card(cardName.Text, Int32.Parse(Attack.Text), Int32.Parse(Health.Text), Int32.Parse(Mana.Text), Int32.Parse(Tier.Text),Taunt.IsChecked == true ,DivineShield.IsChecked == true,Reborn.IsChecked == true,Cleave.IsChecked == true,Poisonous.IsChecked == true, (Race)cardTribe.SelectedItem);
             if (AddEffect.IsChecked == true)
             {
