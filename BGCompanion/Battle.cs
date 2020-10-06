@@ -48,7 +48,7 @@ namespace BGCompanion
             // eg.   a b c d (b dies) summons 3 e board now looks like a e e e c d attack position remains 2 and doesn't increment to 3
 
             //1.
-            
+
             Hand _mine = new Hand();
             _mine.slots = new List<Card>(mine.slots);
             Hand _enemy = new Hand();
@@ -86,8 +86,8 @@ namespace BGCompanion
                 cp.Phase = (startmine || startenemy) ? CombatPhase.startofcombat : CombatPhase.attack;
                 bool alternateSOC = startenemy && startmine;
                 int[] attackbounds = new int[] { cp.Attacker == -1 ? 0 : cp.Attacker, cp.Attacker == -1 ? 1 : cp.Attacker };
-                
-                for (int attackorder = attackbounds[0]; attackorder <= attackbounds[1]; attackorder++  )
+
+                for (int attackorder = attackbounds[0]; attackorder <= attackbounds[1]; attackorder++)
                 {
                     Console.WriteLine("[BATTLE COMMENCEMENT] {0} is attacking.", (Who)attackorder);
                     cp.Attacker = attackorder;
@@ -99,10 +99,10 @@ namespace BGCompanion
                         _mine.slots = new List<Card>(mine.slots);
                         _enemy.slots = new List<Card>(enemy.slots);
                         Combat(new Hand[] { _mine, _enemy }, cp);
-                        
-                        Console.WriteLine("Results Win:{0:P2} Tie:{1:P2} Lose:{2:P2}", (float) winCount/totalBattles, (float) tieCount/totalBattles, (float) loseCount/totalBattles);
+
+                        Console.WriteLine("Results Win:{0:P2} Tie:{1:P2} Lose:{2:P2}", (float)winCount / totalBattles, (float)tieCount / totalBattles, (float)loseCount / totalBattles);
                         int tb = winCount + tieCount + loseCount;
-                        results.Add(new float[] { (float)winCount/tb, (float)tieCount/tb, (float)loseCount/tb });
+                        results.Add(new float[] { (float)winCount / tb, (float)tieCount / tb, (float)loseCount / tb });
                         winCount = 0;
                         tieCount = 0;
                         loseCount = 0;
@@ -116,7 +116,7 @@ namespace BGCompanion
                 tiePerc = results.Average(x => x[1]);
                 losePerc = results.Average(x => x[2]);
             }
-            Console.WriteLine("Win: {0:P2} Tie: {1:P2} Lose: {2:P2}",winPerc, tiePerc, losePerc);
+            Console.WriteLine("Win: {0:P2} Tie: {1:P2} Lose: {2:P2}", winPerc, tiePerc, losePerc);
 
         }
         private static void DoEffect()
@@ -131,7 +131,7 @@ namespace BGCompanion
             Hand[] _Hands = new Hand[] { new Hand(), new Hand() };
             _Hands[0].slots = Hands[0].slots.ConvertAll<Card>(m => new Card(m));
             _Hands[1].slots = Hands[1].slots.ConvertAll<Card>(m => new Card(m));
-            
+
             List<Card>[] _Taunts = { new List<Card>(), new List<Card>() };
             _Taunts[0] = _Hands[0].slots.FindAll(m => m.Taunt);
             _Taunts[1] = _Hands[1].slots.FindAll(m => m.Taunt);
@@ -171,7 +171,7 @@ namespace BGCompanion
                         if (_Starters[combatPosition.EffectHand].Count > 0)
                         {
                             Card c = _Starters[combatPosition.EffectHand][0];
-                            Console.WriteLine("{1} is doing Buff {0}", _Hands[combatPosition.EffectHand].slots.FindIndex(m => m.guid == c.guid),(Who)combatPosition.EffectHand);
+                            Console.WriteLine("{1} is doing Buff {0}", _Hands[combatPosition.EffectHand].slots.FindIndex(m => m.guid == c.guid), (Who)combatPosition.EffectHand);
                             Effect e = c.buffs.Find(m => m.What == Buffs.startOfCombat);
                             if (e.DamagePer)
                             {
@@ -222,7 +222,24 @@ namespace BGCompanion
                             {
                                 combatPosition.AttackQ[combatPosition.EffectHand ^ 1]--;
                             }
-                            _Hands[combatPosition.EffectHand ^ 1].slots.RemoveAt(combatPosition.Target);
+                            //Reborn check 
+                            //TODO: Deathrattles trigger first so there may not be any room for the reborn minion
+
+
+                            if (_Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Reborn)
+                            {
+                                var cardName = _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Name;
+                                _Hands[combatPosition.EffectHand ^ 1].slots.RemoveAt(combatPosition.Target);
+                                _Hands[combatPosition.EffectHand ^ 1].slots.Insert(combatPosition.Target, new Card(Deck.Cards.Find(m => m.Name == cardName)));
+                                _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Reborn = false;
+                                _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Health = 1;
+                            }
+                            else
+                            {
+                                _Hands[combatPosition.EffectHand ^ 1].slots.RemoveAt(combatPosition.Target);
+                            }
+
+
                         }
                         //combatPosition.Phase = CombatPhase.attack;
                         //combatPosition.Target = -1;
@@ -250,7 +267,7 @@ namespace BGCompanion
                         {
                             for (int targetposition = 0; targetposition < _Hands[combatPosition.Attacker ^ 1].slots.Count; targetposition++)
                             {
-                                PrintHand(_Hands,combatPosition);
+                                //PrintHand(_Hands,combatPosition);
                                 Console.WriteLine("{0} is attacking {1}", combatPosition.Attacker, targetposition);
                                 combatPosition.Target = targetposition;
                                 Combat(_Hands, combatPosition);
@@ -260,34 +277,24 @@ namespace BGCompanion
                     else
                     {
                         // Do the whenever phase if starting an attack
-                        int wheneverMode = 0;
-                        if (combatPosition.Phase == CombatPhase.attack)
+
+
+                        List<Card> wheneverAttacks = new List<Card>(_Hands[combatPosition.Attacker].slots.FindAll(m => m.buffs.Exists(b => b.What == Buffs.whenEver && b.Trigger == WheneverTrigger.attacks)));
+                        for (int i = 0; i < wheneverAttacks.Count; i++)
                         {
-                            combatPosition.Phase = CombatPhase.whenever;
-                            wheneverMode = 1;
+                            if (wheneverAttacks[i].buffs.Exists(m => m.Who == Tribe.self) && wheneverAttacks[i].guid == _Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].guid)
+                            {
+                                //self buff attack
+                                _Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].Attack += wheneverAttacks[i].buffs.Find(m => m.Who == Tribe.self).Attack;
+                            }
                         }
 
-                        if (combatPosition.Phase == CombatPhase.whenever)
-                        {
-                            if (wheneverMode == 1) //First time here this attack
-                            {
-                                List<Card> wheneverAttacks = new List<Card>(_Hands[combatPosition.Attacker].slots.FindAll(m => m.buffs.Exists(b => b.What == Buffs.whenEver && b.Trigger == WheneverTrigger.attacks)));
-                                for (int i = 0; i < wheneverAttacks.Count; i++)
-                                {
-                                    //Combat(_Hands, combatPosition);
-                                }
-                            }
-                            else
-                            {
-
-                            }
-
-                        }
 
                         //do some hitting
                         //TODO(#9): Cleave hits adjacent minions
                         //TODO(#10): Windfury 
                         //TODO(#11): Process Whenever effects
+
                         //Calculate impact on attacker
                         //Console.WriteLine("{0} in postion {1} attacks {2} in position {3}", _Hands[combatPosition.Attacker].slots[attackQ[combatPosition.Attacker]].Name, attackQ[combatPosition.Attacker], _Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target].Name, combatPosition.Target);
                         if (_Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].DivineShield)
@@ -327,16 +334,26 @@ namespace BGCompanion
                         //TODO(#13): Process reborn
                         if (_Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target].Health <= 0)
                         {
+                            
+
+                            ProcessReborn(_Hands[combatPosition.Attacker ^ 1], combatPosition.Target);
                             if (combatPosition.AttackQ[combatPosition.Attacker ^ 1] > combatPosition.Target)
                             {
                                 combatPosition.AttackQ[combatPosition.Attacker ^ 1]--;
                             }
-                            _Hands[combatPosition.Attacker ^ 1].slots.RemoveAt(combatPosition.Target);
+                            if ((combatPosition.AttackQ[combatPosition.Attacker ^ 1] > _Hands[combatPosition.Attacker ^ 1].slots.Count - 1))
+                            {
+                                combatPosition.AttackQ[combatPosition.Attacker ^ 1] = 0;
+                            }
+                            //_Hands[combatPosition.Attacker ^ 1].slots.RemoveAt(combatPosition.Target);
                         }
                         if (_Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].Health <= 0)
                         {
-                            //Console.WriteLine("removing {0} at postion {1} from hand", _Hands[combatPosition.Attacker].slots[attackQ[combatPosition.Attacker]].Name, attackQ[combatPosition.Attacker]);
-                            _Hands[combatPosition.Attacker].slots.RemoveAt(combatPosition.AttackQ[combatPosition.Attacker]);
+                            ProcessReborn(_Hands[combatPosition.Attacker], combatPosition.AttackQ[combatPosition.Attacker]);
+                            if (combatPosition.AttackQ[combatPosition.Attacker] >= _Hands[combatPosition.Attacker].slots.Count)
+                            {
+                                combatPosition.AttackQ[combatPosition.Attacker] = 0;
+                            }
                         }
                         else
                         {
@@ -378,22 +395,36 @@ namespace BGCompanion
 
 
 
-            
+
 
         }
-
+        private static void ProcessReborn(Hand hand, int target)
+        {
+            if (hand.slots[target].Reborn)
+            {
+                var cardName = hand.slots[target].Name;
+                hand.slots.RemoveAt(target);
+                hand.slots.Insert(target, new Card(Deck.Cards.Find(m => m.Name == cardName)));
+                hand.slots[target].Reborn = false;
+                hand.slots[target].Health = 1;
+            }
+            else
+            {
+                hand.slots.RemoveAt(target);
+            }
+        }
         private static void PrintHand(Hand[] Hands, CombatPosition cp)
         {
             int ColWidth = 25;// Hands[0].slots.Max(m => m.Name.Length);
             //ColWidth = (Hands[1].slots.Max(m => m.Name.Length) > ColWidth ? Hands[1].slots.Max(m => m.Name.Length) : ColWidth) + 3;
             Console.WriteLine();
-            Console.WriteLine("Stage of Combat: {0} ({1} will attack)", cp.Phase,(Who)cp.Attacker);
+            Console.WriteLine("Stage of Combat: {0} ({1} will attack)", cp.Phase, (Who)cp.Attacker);
             Console.WriteLine();
             Console.WriteLine("Current Board:");
-            
+
             for (int h = 1; h >= 0; h--)
             {
-                Console.WriteLine("{0} ---",(Who)h);
+                Console.WriteLine("{0} ---", (Who)h);
                 StringBuilder stats = new StringBuilder();
                 StringBuilder names = new StringBuilder();
                 for (int i = 0; i < Hands[h].slots.Count; i++)
@@ -403,7 +434,7 @@ namespace BGCompanion
                 }
                 Console.WriteLine(names.ToString());
                 Console.WriteLine(stats.ToString());
-                
+
                 Console.WriteLine();
             }
         }

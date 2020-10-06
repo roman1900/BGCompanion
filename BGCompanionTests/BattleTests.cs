@@ -207,5 +207,49 @@ namespace BGCompanion.Tests
             //Console.WriteLine("Results Win:{0} Tie:{1} Lose:{2}", Battle.winCount, Battle.tieCount, Battle.loseCount);
             Assert.IsTrue(Battle.winPerc == .50 && Battle.tiePerc == 0 && Battle.losePerc == .50);
         }
+        [TestMethod]
+        public void SimulateTest1MicroMv1DeckS()
+        {
+            Hand mine = new Hand();
+            Hand enemy = new Hand();
+            Deck.ImportDeck(@"tier1.json");
+            mine.slots = new List<Card>();
+            enemy.slots = new List<Card>();
+            enemy.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Micro Mummy")));
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Deck Swabbie")));
+            Battle.Simulate(mine, enemy);
+            Assert.IsTrue(Battle.winPerc == 0 && Battle.tiePerc == 1 && Battle.losePerc == 0);
+        }
+        
+        public void SimulateTestAsmo()
+        {
+            Hand mine = new Hand();
+            Hand enemy = new Hand();
+            Deck.ImportDeck(@"testDeck.json");
+            mine.slots = new List<Card>();
+            enemy.slots = new List<Card>();
+            enemy.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Rabid Saurolisk")));
+            enemy.slots[0].Attack = 5;
+            enemy.slots[0].Health = 3;
+            enemy.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Rabid Saurolisk")));
+            enemy.slots[1].Attack = 5;
+            enemy.slots[1].Health = 3;
+            enemy.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Refreshing Anomaly")));
+            enemy.slots[2].Attack = 3;
+            enemy.slots[2].Health = 5;
+            enemy.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Refreshing Anomaly")));
+            enemy.slots[3].Attack = 2;
+            enemy.slots[3].Health = 4;
+            enemy.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Menagerie Mug")));
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Glyph Guardian")));
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Water Droplet")));
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Pack Leader")));
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Red Whelp")));
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Red Whelp")));
+            Battle.Simulate(mine, enemy);
+            Assert.IsTrue(Battle.winPerc == .189 && Battle.tiePerc == .218 && Battle.losePerc == 0.593);
+        }
+        
+
     }
 }
