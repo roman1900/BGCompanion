@@ -223,7 +223,7 @@ namespace BGCompanion
                                 combatPosition.AttackQ[combatPosition.EffectHand ^ 1]--;
                             }
                             //Reborn check 
-                            //TODO: Deathrattles trigger first so there may not be any room for the reborn minion
+                            //TODO(#24): Deathrattles trigger first so there may not be any room for the reborn minion
 
 
                             if (_Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Reborn)
