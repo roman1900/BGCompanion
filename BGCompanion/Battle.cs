@@ -331,7 +331,6 @@ namespace BGCompanion
 
 
 
-                        //TODO(#13): Process reborn
                         if (_Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target].Health <= 0)
                         {
                             
