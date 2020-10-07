@@ -53,7 +53,14 @@ namespace BGCompanion
             Poisonous = c.Poisonous;
             guid = Guid.NewGuid();
         }
-
+        public bool HasWhenever(WheneverTrigger wheneverTrigger,Tribe who)
+        {
+            return buffs.Exists(b => b.What == Buffs.whenEver && b.Who.HasFlag(who) && b.Trigger == wheneverTrigger);
+        }
+        public bool HasDeathrattle()
+        {
+            return buffs.Exists(b => b.What == Buffs.deathRattle);
+        }
         
         public void AddBuff(Effect buff)
         {

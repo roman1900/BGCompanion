@@ -220,7 +220,7 @@ namespace BGCompanion.Tests
             Battle.Simulate(mine, enemy);
             Assert.IsTrue(Battle.winPerc == 0 && Battle.tiePerc == 1 && Battle.losePerc == 0);
         }
-        
+        [TestMethod]
         public void SimulateTestAsmo()
         {
             Hand mine = new Hand();
@@ -249,7 +249,26 @@ namespace BGCompanion.Tests
             Battle.Simulate(mine, enemy);
             Assert.IsTrue(Battle.winPerc == .189 && Battle.tiePerc == .218 && Battle.losePerc == 0.593);
         }
-        
+        [TestMethod]
+        public void SimulateHyena()
+        {
+            Hand mine = new Hand();
+            Hand enemy = new Hand();
+            Deck.ImportDeck(@"testDeck.json");
+            mine.slots = new List<Card>();
+            enemy.slots = new List<Card>();
 
+            enemy.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Murloc Scout")));
+            enemy.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Tabbycat")));
+            enemy.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Alleycat")));
+            enemy.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Tabbycat")));
+            enemy.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Scavenging Hyena")));
+
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Water Droplet")));
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Water Droplet")));
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Pack Leader")));
+            Battle.Simulate(mine, enemy);
+            Assert.IsTrue(Battle.winPerc.ToString("0.0000") == "0.1739" && Battle.tiePerc.ToString("0.0000") == "0.1304" && Battle.losePerc.ToString("0.0000") == "0.6957");
+        }
     }
 }

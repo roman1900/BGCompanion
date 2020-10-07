@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Accessibility;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -138,6 +139,9 @@ namespace BGCompanion
             List<Card>[] _Starters = { new List<Card>(), new List<Card>() };
             _Starters[0] = _Hands[0].slots.FindAll(m => m.buffs.Exists(b => b.What == Buffs.startOfCombat));
             _Starters[1] = _Hands[1].slots.FindAll(m => m.buffs.Exists(b => b.What == Buffs.startOfCombat));
+            //We should also check at this point whether the following conditions exist:
+            //A single unit defeats all of the opponents minions (Implemented in SoloMinion)
+            PrintHand(_Hands, combatPosition);
             //Is this battle over?
             if (_Hands[0].slots.Count == 0 || _Hands[1].slots.Count == 0)
             {
@@ -146,11 +150,13 @@ namespace BGCompanion
                 {
                     if (_Hands[1].slots.Count == 0)
                     {
+                        Console.WriteLine("We Tied");
                         tieCount++;
                         return;
                     }
                     else
                     {
+                        Console.WriteLine("We Lost");
                         loseCount++;
                         return;
                     }
@@ -162,7 +168,26 @@ namespace BGCompanion
                     return;
                 }
             }
-            PrintHand(_Hands, combatPosition);
+            else if (!(_Hands[0].slots.Exists(m => m.Poisonous || m.Reborn || m.DivineShield))
+                && !(_Hands[1].slots.Exists(m => m.Poisonous || m.Reborn || m.DivineShield)))
+            {
+                if (SoloMinion(_Hands[0],_Hands[1]))
+                {
+                    Console.WriteLine("We Won");
+                    totalBattles++;
+                    winCount++;
+                    return;
+                }
+                if (SoloMinion(_Hands[1],_Hands[0]))
+                {
+                    Console.WriteLine("We Lost");
+                    totalBattles++;
+                    loseCount++;
+                    return;
+                }
+                
+            }
+            
             switch (combatPosition.Phase)
             {
                 case CombatPhase.startofcombat:
@@ -203,19 +228,13 @@ namespace BGCompanion
                             Combat(_Hands, combatPosition);
                         }
                     }
-                    else //We are doing to effect
+                    else //We are doing the effect
                     {
                         Console.WriteLine("Start of Combat Effects");
                         //TODO(#19): Need to process potential triggers due to start of combat damage
-                        if (_Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].DivineShield)
-                        {
-                            _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].DivineShield = false;
-                        }
-                        else
-                        {
-                            _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Health -= combatPosition.EffectDirectDamage;
-                            Console.WriteLine("{0} in position {1} new health is {2}", _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Name, combatPosition.Target, _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Health);
-                        }
+                        UpdateHealth(_Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target], combatPosition.EffectDirectDamage);
+                        Console.WriteLine("{0} in position {1} new health is {2}", _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Name, combatPosition.Target, _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Health);
+                        
                         if (_Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Health <= 0)
                         {
                             if (combatPosition.AttackQ[combatPosition.EffectHand ^ 1] > combatPosition.Target)
@@ -254,7 +273,7 @@ namespace BGCompanion
                             for (int targetposition = 0; targetposition < _Hands[combatPosition.Attacker ^ 1].slots.Count; targetposition++)
                             {
                                 //PrintHand(_Hands,combatPosition);
-                                Console.WriteLine("{0} is attacking {1}", combatPosition.Attacker, targetposition);
+                                Console.WriteLine("{0}'s  {1} in position {2} is attacking position {3}", (Who)combatPosition.Attacker, _Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].Name, combatPosition.AttackQ[combatPosition.Attacker], targetposition);
                                 combatPosition.Target = targetposition;
                                 Combat(_Hands, combatPosition);
                             }
@@ -278,39 +297,14 @@ namespace BGCompanion
 
                         //do some hitting
                         //TODO(#9): Cleave hits adjacent minions
-                        //TODO(#10): Windfury 
+                        //TODO(#10): Windfury e
                         //TODO(#11): Process Whenever effects
 
                         //Calculate impact on attacker
-                        //Console.WriteLine("{0} in postion {1} attacks {2} in position {3}", _Hands[combatPosition.Attacker].slots[attackQ[combatPosition.Attacker]].Name, attackQ[combatPosition.Attacker], _Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target].Name, combatPosition.Target);
-                        if (_Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].DivineShield)
-                        {
-                            _Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].DivineShield = false;
-
-                        }
-                        else if (_Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target].Poisonous)
-                        {
-                            _Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].Health = -99;
-                        }
-                        else
-                        {
-                            _Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].Health -= _Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target].Attack;
-                            //Console.WriteLine("{0} in position {1} new health is {2}", _Hands[combatPosition.Attacker].slots[attackQ[combatPosition.Attacker]].Name, attackQ[combatPosition.Attacker], _Hands[combatPosition.Attacker].slots[attackQ[combatPosition.Attacker]].Health);
-                        }
+                        UpdateHealth(_Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]], _Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target]);
                         //Calculate impact on defender
-                        if (_Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target].DivineShield)
-                        {
-                            _Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target].DivineShield = false;
-                        }
-                        else if (_Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].Poisonous)
-                        {
-                            _Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target].Health = -99;
-                        }
-                        else
-                        {
-                            _Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target].Health -= _Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].Attack;
-                            //Console.WriteLine("{0} in position {1} new health is {2}", _Hands[combatPosition.Attacker ^ 1].slots[target].Name,target, _Hands[combatPosition.Attacker ^ 1].slots[target].Health);
-                        }
+                        UpdateHealth(_Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target], _Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]]);
+                        
 
 
                         //TODO(#12): Process deathrattles
@@ -319,9 +313,10 @@ namespace BGCompanion
 
                         if (_Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target].Health <= 0)
                         {
-                            //WORKING HERE
-                            //_Hands[combatPosition.Attacker ^ 1].slots.FindAll
-                            ProcessWheneverDies(_Hands[combatPosition.Attacker ^ 1], combatPosition.Target);
+
+                            _Hands[combatPosition.Attacker ^ 1].slots.FindAll(m => m.HasWhenever(WheneverTrigger.dies, Tribe.friendly))
+                                .ForEach(d => ProcessWheneverDies(d, d.buffs.Find(b => b.What == Buffs.whenEver && b.Who.HasFlag(Tribe.friendly) && b.Trigger == WheneverTrigger.dies), _Hands[combatPosition.Attacker ^ 1], combatPosition.Target));
+                            
 
                             ProcessReborn(_Hands[combatPosition.Attacker ^ 1], combatPosition.Target);
                             if (combatPosition.AttackQ[combatPosition.Attacker ^ 1] > combatPosition.Target)
@@ -332,10 +327,13 @@ namespace BGCompanion
                             {
                                 combatPosition.AttackQ[combatPosition.Attacker ^ 1] = 0;
                             }
-                            //_Hands[combatPosition.Attacker ^ 1].slots.RemoveAt(combatPosition.Target);
+                            
                         }
                         if (_Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].Health <= 0)
                         {
+                            _Hands[combatPosition.Attacker].slots.FindAll(m => m.buffs.Exists(b => b.What == Buffs.whenEver && b.Who.HasFlag(Tribe.friendly) && b.Trigger == WheneverTrigger.dies))
+                                .ForEach(d => ProcessWheneverDies(d, d.buffs.Find(b => b.What == Buffs.whenEver && b.Who.HasFlag(Tribe.friendly) && b.Trigger == WheneverTrigger.dies), _Hands[combatPosition.Attacker], combatPosition.AttackQ[combatPosition.Attacker]));
+
                             ProcessReborn(_Hands[combatPosition.Attacker], combatPosition.AttackQ[combatPosition.Attacker]);
                             if (combatPosition.AttackQ[combatPosition.Attacker] >= _Hands[combatPosition.Attacker].slots.Count)
                             {
@@ -346,34 +344,13 @@ namespace BGCompanion
                         {
                             combatPosition.AttackQ[combatPosition.Attacker] = combatPosition.AttackQ[combatPosition.Attacker] == _Hands[combatPosition.Attacker].slots.Count - 1 ? 0 : combatPosition.AttackQ[combatPosition.Attacker] + 1;
                         }
-                        if (_Hands[0].slots.Count == 0 || _Hands[1].slots.Count == 0)
-                        {
-                            totalBattles++;
-                            if (_Hands[0].slots.Count == 0)
-                            {
-                                if (_Hands[1].slots.Count == 0)
-                                {
-                                    tieCount++;
-                                }
-                                else
-                                {
-                                    loseCount++;
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine("We Won");
-                                winCount++;
-                            }
-                        }
-                        else
-                        {
-                            combatPosition.Attacker ^= 1;
-                            combatPosition.Target = -1;
-                            combatPosition.Phase = CombatPhase.attack;
-                            combatPosition.AttackCount++;
-                            Combat(_Hands, combatPosition);
-                        }
+
+                        combatPosition.Attacker ^= 1;
+                        combatPosition.Target = -1;
+                        combatPosition.Phase = CombatPhase.attack;
+                        combatPosition.AttackCount++;
+                        Combat(_Hands, combatPosition);
+
                     }
                     break;
                 default:
@@ -385,13 +362,71 @@ namespace BGCompanion
 
 
         }
-
-        private static void ProcessWheneverDies(Hand hand, int target)
+        private static bool SoloMinion(Hand Checking, Hand Against)
         {
-            //hand.slots.ForEach(m => m.buffs.Exists(b => b.What == Buffs.whenEver && b.Who.HasFlag(Tribe.friendly) && b.Trigger == WheneverTrigger.dies)))
-            //{
-            //    //if (hand.slots[target].Tribe & )
-            //}
+            bool yep = false;
+            if (!Against.slots.Exists(m => m.buffs.Count > 0))
+            {
+                //The opponent has no buffs left check for card which solo's
+                
+                Checking.slots.ForEach(delegate (Card c)
+                {
+                    if (c.Health > Against.slots.Sum(m => m.Attack) && c.Attack >= Against.slots.Max(m => m.Health))
+                    {
+                        yep = true;
+                    }
+                });
+                
+            }
+            return yep;
+        }
+        private static void ProcessDeathRattle(Card deadCard, Effect e, Hand hand, int target)
+        {
+
+        }
+
+        private static void UpdateHealth(Card toUpdate, Card damager)
+        {
+            if (toUpdate.DivineShield)
+            {
+                toUpdate.DivineShield = false;
+
+            }
+            else if (damager.Poisonous)
+            {
+                toUpdate.Health = -99;
+            }
+            else
+            {
+                toUpdate.Health -= damager.Attack;
+            }
+        }
+        
+        private static void UpdateHealth(Card toUpdate, int directDamage)
+        {
+            if (toUpdate.DivineShield)
+            {
+                toUpdate.DivineShield = false;
+
+            }
+            else
+            {
+                toUpdate.Health -= directDamage;
+            }
+        }
+
+        private static void ProcessWheneverDies(Card buffCard, Effect e, Hand hand, int target)
+        {
+            //Whenever friendly x dies buff self
+            if (((Tribe)hand.slots[target].Tribe & e.Who) > 0)
+            {
+                if (e.Target.HasFlag(Tribe.self))
+                {
+                    buffCard.Attack += e.Attack;
+                    buffCard.Health += e.Health;
+                }
+            }
+            
         }
 
         private static void ProcessReborn(Hand hand, int target)
