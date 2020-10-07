@@ -171,23 +171,23 @@ namespace BGCompanion
             else if (!(_Hands[0].slots.Exists(m => m.Poisonous || m.Reborn || m.DivineShield))
                 && !(_Hands[1].slots.Exists(m => m.Poisonous || m.Reborn || m.DivineShield)))
             {
-                if (SoloMinion(_Hands[0],_Hands[1]))
+                if (SoloMinion(_Hands[0], _Hands[1]))
                 {
                     Console.WriteLine("We Won");
                     totalBattles++;
                     winCount++;
                     return;
                 }
-                if (SoloMinion(_Hands[1],_Hands[0]))
+                if (SoloMinion(_Hands[1], _Hands[0]))
                 {
                     Console.WriteLine("We Lost");
                     totalBattles++;
                     loseCount++;
                     return;
                 }
-                
+
             }
-            
+
             switch (combatPosition.Phase)
             {
                 case CombatPhase.startofcombat:
@@ -234,7 +234,7 @@ namespace BGCompanion
                         //TODO(#19): Need to process potential triggers due to start of combat damage
                         UpdateHealth(_Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target], combatPosition.EffectDirectDamage);
                         Console.WriteLine("{0} in position {1} new health is {2}", _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Name, combatPosition.Target, _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Health);
-                        
+
                         if (_Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target].Health <= 0)
                         {
                             if (combatPosition.AttackQ[combatPosition.EffectHand ^ 1] > combatPosition.Target)
@@ -243,8 +243,9 @@ namespace BGCompanion
                             }
                             //Reborn check 
                             //TODO(#24): Deathrattles trigger first so there may not be any room for the reborn minion
-
-                            ProcessReborn(_Hands[combatPosition.EffectHand ^ 1], combatPosition.Target);
+                            Card ded = _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target];
+                            _Hands[combatPosition.EffectHand ^ 1].slots.RemoveAt(combatPosition.Target);
+                            ProcessReborn(ded, _Hands[combatPosition.EffectHand ^ 1], combatPosition.Target);
                         }
                         //combatPosition.Phase = CombatPhase.attack;
                         //combatPosition.Target = -1;
@@ -291,6 +292,8 @@ namespace BGCompanion
                             if (wheneverAttacks[i].buffs.Exists(m => m.Who == Tribe.self) && wheneverAttacks[i].guid == _Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].guid)
                             {
                                 _Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].Attack += wheneverAttacks[i].buffs.Find(m => m.Who == Tribe.self).Attack;
+                                wheneverAttacks[i].buffs.Find(m => m.Who == Tribe.self).Attack = _Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].Attack;
+
                             }
                         }
 
@@ -303,7 +306,7 @@ namespace BGCompanion
                         UpdateHealth(_Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]], _Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target]);
                         //Calculate impact on defender
                         UpdateHealth(_Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target], _Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]]);
-                        
+
 
 
                         //TODO(#12): Process deathrattles
@@ -313,11 +316,17 @@ namespace BGCompanion
                         if (_Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target].Health <= 0)
                         {
 
+
+
                             _Hands[combatPosition.Attacker ^ 1].slots.FindAll(m => m.HasWhenever(WheneverTrigger.dies, Tribe.friendly))
                                 .ForEach(d => ProcessWheneverDies(d, d.buffs.Find(b => b.What == Buffs.whenEver && b.Who.HasFlag(Tribe.friendly) && b.Trigger == WheneverTrigger.dies), _Hands[combatPosition.Attacker ^ 1], combatPosition.Target));
-                            
 
-                            ProcessReborn(_Hands[combatPosition.Attacker ^ 1], combatPosition.Target);
+                            Card ded = _Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target];
+                            _Hands[combatPosition.Attacker ^ 1].slots.RemoveAt(combatPosition.Target);
+                            //TODO:We have single DeathRattles for now. Need to implement multiple deathrattles
+                            if (ded.buffs.Exists(b => b.What == Buffs.deathRattle))
+                                ProcessDeathRattle(ded, ded.buffs.Find(b => b.What == Buffs.deathRattle), _Hands[combatPosition.Attacker ^ 1], combatPosition.Target);
+                            ProcessReborn(ded, _Hands[combatPosition.Attacker ^ 1], combatPosition.Target);
                             if (combatPosition.AttackQ[combatPosition.Attacker ^ 1] > combatPosition.Target)
                             {
                                 combatPosition.AttackQ[combatPosition.Attacker ^ 1]--;
@@ -326,14 +335,17 @@ namespace BGCompanion
                             {
                                 combatPosition.AttackQ[combatPosition.Attacker ^ 1] = 0;
                             }
-                            
+
                         }
                         if (_Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].Health <= 0)
                         {
                             _Hands[combatPosition.Attacker].slots.FindAll(m => m.buffs.Exists(b => b.What == Buffs.whenEver && b.Who.HasFlag(Tribe.friendly) && b.Trigger == WheneverTrigger.dies))
                                 .ForEach(d => ProcessWheneverDies(d, d.buffs.Find(b => b.What == Buffs.whenEver && b.Who.HasFlag(Tribe.friendly) && b.Trigger == WheneverTrigger.dies), _Hands[combatPosition.Attacker], combatPosition.AttackQ[combatPosition.Attacker]));
-
-                            ProcessReborn(_Hands[combatPosition.Attacker], combatPosition.AttackQ[combatPosition.Attacker]);
+                            Card ded = _Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]];
+                            _Hands[combatPosition.Attacker].slots.RemoveAt(combatPosition.AttackQ[combatPosition.Attacker]);
+                            if (ded.buffs.Exists(b => b.What == Buffs.deathRattle))
+                                ProcessDeathRattle(ded, ded.buffs.Find(b => b.What == Buffs.deathRattle), _Hands[combatPosition.Attacker], combatPosition.AttackQ[combatPosition.Attacker]);
+                            ProcessReborn(ded, _Hands[combatPosition.Attacker], combatPosition.AttackQ[combatPosition.Attacker]);
                             if (combatPosition.AttackQ[combatPosition.Attacker] >= _Hands[combatPosition.Attacker].slots.Count)
                             {
                                 combatPosition.AttackQ[combatPosition.Attacker] = 0;
@@ -367,7 +379,7 @@ namespace BGCompanion
             if (!Against.slots.Exists(m => m.buffs.Count > 0))
             {
                 //The opponent has no buffs left check for card which solo's
-                
+
                 Checking.slots.ForEach(delegate (Card c)
                 {
                     if (c.Health > Against.slots.Sum(m => m.Attack) && c.Attack >= Against.slots.Max(m => m.Health))
@@ -375,13 +387,36 @@ namespace BGCompanion
                         yep = true;
                     }
                 });
-                
+
             }
             return yep;
         }
         private static void ProcessDeathRattle(Card deadCard, Effect e, Hand hand, int target)
         {
+            //Summon Minions
 
+            if (e.Summons != null)
+            {
+                e.Summons.ForEach(delegate (Card c)
+                {
+                    if (!hand.Full())
+                    {
+                        hand.slots.Insert(target, c);
+                    }
+                        //TODO: Need to implement whenever summons 
+                    });
+            }
+            
+            if (e.Target.HasFlag(Tribe.all) && e.Target.HasFlag(Tribe.friendly))
+            {
+                hand.slots.ForEach(delegate (Card c)
+                {
+                    c.Health += e.Health;
+                    c.Attack += e.Attack;
+                });
+            }
+
+            //TODO: Implement Random deathrattle events
         }
 
         private static void UpdateHealth(Card toUpdate, Card damager)
@@ -400,7 +435,7 @@ namespace BGCompanion
                 toUpdate.Health -= damager.Attack;
             }
         }
-        
+
         private static void UpdateHealth(Card toUpdate, int directDamage)
         {
             if (toUpdate.DivineShield)
@@ -425,23 +460,20 @@ namespace BGCompanion
                     buffCard.Health += e.Health;
                 }
             }
-            
+
         }
 
-        private static void ProcessReborn(Hand hand, int target)
+        private static void ProcessReborn(Card deadMinion, Hand hand, int target)
         {
-            if (hand.slots[target].Reborn)
+            if (deadMinion.Reborn && !hand.Full())
             {
-                var cardName = hand.slots[target].Name;
-                hand.slots.RemoveAt(target);
-                hand.slots.Insert(target, new Card(Deck.Cards.Find(m => m.Name == cardName)));
+                //var cardName = hand.slots[target].Name;
+                //hand.slots.RemoveAt(target);
+                hand.slots.Insert(target, new Card(Deck.Cards.Find(m => m.Name == deadMinion.Name)));
                 hand.slots[target].Reborn = false;
                 hand.slots[target].Health = 1;
             }
-            else
-            {
-                hand.slots.RemoveAt(target);
-            }
+
         }
 
         private static void PrintHand(Hand[] Hands, CombatPosition cp)

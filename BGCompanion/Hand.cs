@@ -24,5 +24,9 @@ namespace BGCompanion
         {
             slots.Remove(c);
         }
+        public bool Full()
+        {
+            return slots.Count == 7;
+        }
     }
 }
