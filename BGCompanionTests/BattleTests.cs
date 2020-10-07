@@ -247,7 +247,8 @@ namespace BGCompanion.Tests
             mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Red Whelp")));
             mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Red Whelp")));
             Battle.Simulate(mine, enemy);
-            Assert.IsTrue(Battle.winPerc == .189 && Battle.tiePerc == .218 && Battle.losePerc == 0.593);
+            //Assert.IsTrue(Battle.winPerc == .189 && Battle.tiePerc == .218 && Battle.losePerc == 0.593);
+            Assert.IsTrue(Battle.winPerc.ToString("0.0000") == "0.2077" && Battle.tiePerc.ToString("0.0000") == "0.2356" && Battle.losePerc.ToString("0.0000") == "0.5567");
         }
         [TestMethod]
         public void SimulateHyena()
