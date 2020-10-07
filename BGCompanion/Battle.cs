@@ -416,7 +416,7 @@ namespace BGCompanion
                 });
             }
 
-            //TODO: Implement Random deathrattle events
+            //TODO(#26): Implement Random deathrattle events
         }
 
         private static void UpdateHealth(Card toUpdate, Card damager)
