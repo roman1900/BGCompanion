@@ -298,7 +298,6 @@ namespace BGCompanion
                         //do some hitting
                         //TODO(#9): Cleave hits adjacent minions
                         //TODO(#10): Windfury e
-                        //TODO(#11): Process Whenever effects
 
                         //Calculate impact on attacker
                         UpdateHealth(_Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]], _Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target]);
