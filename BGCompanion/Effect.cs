@@ -70,7 +70,7 @@ namespace BGCompanion
             Who = m.Who;
             Trigger = m.Trigger;
             Target = m.Target;
-            if (m.Summons != null) { m.Summons.ConvertAll<Card>(s => new Card(s)); }
+            if (m.Summons != null) { Summons = m.Summons.ConvertAll<Card>(s => new Card(s)); }
             Damage = m.Damage;
             DamagePer = m.DamagePer;
             Attack = m.Attack;

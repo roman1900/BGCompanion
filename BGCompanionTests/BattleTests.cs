@@ -271,5 +271,68 @@ namespace BGCompanion.Tests
             Battle.Simulate(mine, enemy);
             Assert.IsTrue(Battle.winPerc.ToString("0.0000") == "0.1739" && Battle.tiePerc.ToString("0.0000") == "0.1304" && Battle.losePerc.ToString("0.0000") == "0.6957");
         }
+        [TestMethod]
+        public void SimulateSummonRebornNoRoomonBoard()
+        {
+            Hand mine = new Hand();
+            Hand enemy = new Hand();
+            Deck.ImportDeck(@"testDeck.json");
+            mine.slots = new List<Card>();
+            enemy.slots = new List<Card>();
+            enemy.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Tabbycat")));
+            enemy.slots[0].Attack = 4;
+            enemy.slots[0].Health = 4;
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Harvest Golem")));
+            mine.slots[0].Reborn = true;
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Harvest Golem")));
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Harvest Golem")));
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Harvest Golem")));
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Harvest Golem")));
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Murloc Scout")));
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Murloc Scout")));
+            Battle.Simulate(mine, enemy);
+            Assert.IsTrue(Battle.winPerc==1);
+        }
+        [TestMethod]
+        public void SimulateSummonRebornAndDeathRattle()
+        {
+            Hand mine = new Hand();
+            Hand enemy = new Hand();
+            Deck.ImportDeck(@"testDeck.json");
+            mine.slots = new List<Card>();
+            enemy.slots = new List<Card>();
+            enemy.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Tabbycat")));
+            enemy.slots[0].Attack = 4;
+            enemy.slots[0].Health = 4;
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Harvest Golem")));
+            mine.slots[0].Reborn = true;
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Harvest Golem")));
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Harvest Golem")));
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Harvest Golem")));
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Harvest Golem")));
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Murloc Scout")));
+            Battle.Simulate(mine, enemy);
+            Assert.IsTrue(Battle.winPerc == 1);
+        }
+        [TestMethod]
+        public void SimulateDeathRattleGiveAllBuff()
+        {
+            Hand mine = new Hand();
+            Hand enemy = new Hand();
+            Deck.ImportDeck(@"testDeck.json");
+            mine.slots = new List<Card>();
+            enemy.slots = new List<Card>();
+            enemy.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Tabbycat")));
+            enemy.slots[0].Attack = 4;
+            enemy.slots[0].Health = 4;
+            enemy.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Tabbycat")));
+            enemy.slots[0].Attack = 4;
+            enemy.slots[0].Health = 4;
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Spawn of N'Zoth")));
+            mine.slots[0].Reborn = true;
+            mine.slots.Add(new Card(Deck.Cards.Find(m => m.Name == "Harvest Golem")));
+            Battle.Simulate(mine, enemy);
+            Assert.IsTrue(Battle.winPerc == 1);
+        }
     }
 }
