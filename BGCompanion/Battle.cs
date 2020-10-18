@@ -139,6 +139,9 @@ namespace BGCompanion
             List<Card>[] _Starters = { new List<Card>(), new List<Card>() };
             _Starters[0] = _Hands[0].slots.FindAll(m => m.buffs.Exists(b => b.What == Buffs.startOfCombat));
             _Starters[1] = _Hands[1].slots.FindAll(m => m.buffs.Exists(b => b.What == Buffs.startOfCombat));
+            List<Card>[] _WheneverDies = { new List<Card>(), new List<Card>() };
+            _WheneverDies[0] = _Hands[0].slots.FindAll(m => m.HasWhenever(WheneverTrigger.dies, Tribe.friendly));
+            _WheneverDies[1] = _Hands[1].slots.FindAll(m => m.HasWhenever(WheneverTrigger.dies, Tribe.friendly));
             //We should also check at this point whether the following conditions exist:
             //A single unit defeats all of the opponents minions (Implemented in SoloMinion)
             PrintHand(_Hands, combatPosition);
@@ -316,10 +319,15 @@ namespace BGCompanion
                         if (_Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target].Health <= 0)
                         {
 
+                            _Hands[combatPosition.Attacker ^ 1].slots.FindAll(m => m.Health <= 0)
+                                .ForEach(delegate (Card c)
+                                {
+                                    _WheneverDies[combatPosition.Attacker ^ 1]
+                                        .ForEach(d => ProcessWheneverDies(d,d.GetWhenever(WheneverTrigger.dies,Tribe.friendly), c));
+                                });
 
-
-                            _Hands[combatPosition.Attacker ^ 1].slots.FindAll(m => m.HasWhenever(WheneverTrigger.dies, Tribe.friendly))
-                                .ForEach(d => ProcessWheneverDies(d, d.buffs.Find(b => b.What == Buffs.whenEver && b.Who.HasFlag(Tribe.friendly) && b.Trigger == WheneverTrigger.dies), _Hands[combatPosition.Attacker ^ 1], combatPosition.Target));
+                            //_Hands[combatPosition.Attacker ^ 1].slots.FindAll(m => m.HasWhenever(WheneverTrigger.dies, Tribe.friendly))
+                            //    .ForEach(d => ProcessWheneverDies(d, d.buffs.Find(b => b.What == Buffs.whenEver && b.Who.HasFlag(Tribe.friendly) && b.Trigger == WheneverTrigger.dies), _Hands[combatPosition.Attacker ^ 1], combatPosition.Target));
 
                             Card ded = _Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target];
                             _Hands[combatPosition.Attacker ^ 1].slots.RemoveAt(combatPosition.Target);
@@ -403,10 +411,10 @@ namespace BGCompanion
                     {
                         hand.slots.Insert(target, c);
                     }
-                        //TODO: Need to implement whenever summons 
-                    });
+                    //TODO: Need to implement whenever summons 
+                });
             }
-            
+
             if (e.Target.HasFlag(Tribe.all) && e.Target.HasFlag(Tribe.friendly))
             {
                 hand.slots.ForEach(delegate (Card c)
@@ -462,7 +470,19 @@ namespace BGCompanion
             }
 
         }
+        private static void ProcessWheneverDies(Card buffCard, Effect e, Card dedCard)
+        {
+            //Whenever friendly x dies buff self
+            if (((Tribe)dedCard.Tribe & e.Who) > 0)
+            {
+                if (e.Target.HasFlag(Tribe.self))
+                {
+                    buffCard.Attack += e.Attack;
+                    buffCard.Health += e.Health;
+                }
+            }
 
+        }
         private static void ProcessReborn(Card deadMinion, Hand hand, int target)
         {
             if (deadMinion.Reborn && !hand.Full())

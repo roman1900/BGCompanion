@@ -57,6 +57,10 @@ namespace BGCompanion
         {
             return buffs.Exists(b => b.What == Buffs.whenEver && b.Who.HasFlag(who) && b.Trigger == wheneverTrigger);
         }
+        public Effect GetWhenever(WheneverTrigger wheneverTrigger, Tribe who)
+        {
+            return buffs.Find(b => b.What == Buffs.whenEver && b.Who.HasFlag(who) && b.Trigger == wheneverTrigger);
+        }
         public bool HasDeathrattle()
         {
             return buffs.Exists(b => b.What == Buffs.deathRattle);
