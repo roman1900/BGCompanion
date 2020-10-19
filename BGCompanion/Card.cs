@@ -21,6 +21,7 @@ namespace BGCompanion
         public bool Cleave { get; set; }
         public bool Poisonous { get; set; }
         public Guid guid { get; set; }
+        public bool Alive { get; set; }
         [JsonConstructor]
         public Card(string name,int attack, int health, int mana, int tier, bool taunt,bool divineshield,bool reborn,bool cleave, bool poisonous, Race tribe)
         {
@@ -36,6 +37,7 @@ namespace BGCompanion
             Cleave = cleave;
             Poisonous = poisonous;
             buffs = new List<Effect>();
+            Alive = true;
         }
         public Card(Card c)
         {
@@ -52,6 +54,7 @@ namespace BGCompanion
             Cleave = c.Cleave;
             Poisonous = c.Poisonous;
             guid = Guid.NewGuid();
+            Alive = c.Alive;
         }
         public bool HasWhenever(WheneverTrigger wheneverTrigger,Tribe who)
         {

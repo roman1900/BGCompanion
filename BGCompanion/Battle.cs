@@ -316,7 +316,7 @@ namespace BGCompanion
 
 
 
-                        if (_Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target].Health <= 0)
+                        if (!_Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target].Alive)
                         {
 
                             _Hands[combatPosition.Attacker ^ 1].slots.FindAll(m => m.Health <= 0)
@@ -345,7 +345,7 @@ namespace BGCompanion
                             }
 
                         }
-                        if (_Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].Health <= 0)
+                        if (!_Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].Alive)
                         {
                             _Hands[combatPosition.Attacker].slots.FindAll(m => m.buffs.Exists(b => b.What == Buffs.whenEver && b.Who.HasFlag(Tribe.friendly) && b.Trigger == WheneverTrigger.dies))
                                 .ForEach(d => ProcessWheneverDies(d, d.buffs.Find(b => b.What == Buffs.whenEver && b.Who.HasFlag(Tribe.friendly) && b.Trigger == WheneverTrigger.dies), _Hands[combatPosition.Attacker], combatPosition.AttackQ[combatPosition.Attacker]));
@@ -442,6 +442,7 @@ namespace BGCompanion
             {
                 toUpdate.Health -= damager.Attack;
             }
+            toUpdate.Alive = toUpdate.Health > 0;
         }
 
         private static void UpdateHealth(Card toUpdate, int directDamage)
