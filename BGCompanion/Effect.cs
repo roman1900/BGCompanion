@@ -57,6 +57,7 @@ namespace BGCompanion
         attacks = 0b010,
         per     = 0b100,
     }
+    [Serializable]
     public class Effect
     {
        

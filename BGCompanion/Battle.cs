@@ -1,4 +1,5 @@
 ﻿using Accessibility;
+using LiteDB;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,7 +50,14 @@ namespace BGCompanion
             // eg.   a b c d (b dies) summons 3 e board now looks like a e e e c d attack position remains 2 and doesn't increment to 3
 
             //1.
-
+            using(var db = new LiteDatabase("hash.db"))
+            {
+                var col = db.GetCollection<HashResult>("hashes");
+                var hashresult = new HashResult
+                {
+                    Hash = Hand.HashedString(Hand.Combine(mine.GetHash(), enemy.GetHash()))
+                };
+            }
             Hand _mine = new Hand();
             _mine.slots = new List<Card>(mine.slots);
             Hand _enemy = new Hand();
@@ -143,7 +151,6 @@ namespace BGCompanion
             _WheneverDies[0] = _Hands[0].slots.FindAll(m => m.HasWhenever(WheneverTrigger.dies, Tribe.friendly));
             _WheneverDies[1] = _Hands[1].slots.FindAll(m => m.HasWhenever(WheneverTrigger.dies, Tribe.friendly));
             //We should also check at this point whether the following conditions exist:
-            //A single unit defeats all of the opponents minions (Implemented in SoloMinion)
             PrintHand(_Hands, combatPosition);
             //Is this battle over?
             if (_Hands[0].slots.Count == 0 || _Hands[1].slots.Count == 0)
@@ -171,25 +178,7 @@ namespace BGCompanion
                     return;
                 }
             }
-            else if (!(_Hands[0].slots.Exists(m => m.Poisonous || m.Reborn || m.DivineShield))
-                && !(_Hands[1].slots.Exists(m => m.Poisonous || m.Reborn || m.DivineShield)))
-            {
-                if (SoloMinion(_Hands[0], _Hands[1]))
-                {
-                    Console.WriteLine("We Won");
-                    totalBattles++;
-                    winCount++;
-                    return;
-                }
-                if (SoloMinion(_Hands[1], _Hands[0]))
-                {
-                    Console.WriteLine("We Lost");
-                    totalBattles++;
-                    loseCount++;
-                    return;
-                }
-
-            }
+            
 
             switch (combatPosition.Phase)
             {
@@ -199,7 +188,7 @@ namespace BGCompanion
                         if (_Starters[combatPosition.EffectHand].Count > 0)
                         {
                             Card c = _Starters[combatPosition.EffectHand][0];
-                            Console.WriteLine("{1} is doing Buff {0}", _Hands[combatPosition.EffectHand].slots.FindIndex(m => m.guid == c.guid), (Who)combatPosition.EffectHand);
+                            Console.WriteLine("{1} is doing Buff {0}", _Hands[combatPosition.EffectHand].slots[c.Position], (Who)combatPosition.EffectHand);
                             Effect e = c.buffs.Find(m => m.What == Buffs.startOfCombat);
                             if (e.DamagePer)
                             {
@@ -247,7 +236,8 @@ namespace BGCompanion
                             //Reborn check 
                             //TODO(#24): Deathrattles trigger first so there may not be any room for the reborn minion
                             Card ded = _Hands[combatPosition.EffectHand ^ 1].slots[combatPosition.Target];
-                            _Hands[combatPosition.EffectHand ^ 1].slots.RemoveAt(combatPosition.Target);
+                            //_Hands[combatPosition.EffectHand ^ 1].slots.RemoveAt(combatPosition.Target);
+                            _Hands[combatPosition.EffectHand ^ 1].Pop(ded);
                             ProcessReborn(ded, _Hands[combatPosition.EffectHand ^ 1], combatPosition.Target);
                         }
                         //combatPosition.Phase = CombatPhase.attack;
@@ -292,7 +282,7 @@ namespace BGCompanion
                         for (int i = 0; i < wheneverAttacks.Count; i++)
                         {
                             //self buff attack
-                            if (wheneverAttacks[i].buffs.Exists(m => m.Who == Tribe.self) && wheneverAttacks[i].guid == _Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].guid)
+                            if (wheneverAttacks[i].buffs.Exists(m => m.Who == Tribe.self) && wheneverAttacks[i].Position == combatPosition.AttackQ[combatPosition.Attacker])
                             {
                                 _Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].Attack += wheneverAttacks[i].buffs.Find(m => m.Who == Tribe.self).Attack;
                                 wheneverAttacks[i].buffs.Find(m => m.Who == Tribe.self).Attack = _Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]].Attack;
@@ -330,7 +320,8 @@ namespace BGCompanion
                             //    .ForEach(d => ProcessWheneverDies(d, d.buffs.Find(b => b.What == Buffs.whenEver && b.Who.HasFlag(Tribe.friendly) && b.Trigger == WheneverTrigger.dies), _Hands[combatPosition.Attacker ^ 1], combatPosition.Target));
 
                             Card ded = _Hands[combatPosition.Attacker ^ 1].slots[combatPosition.Target];
-                            _Hands[combatPosition.Attacker ^ 1].slots.RemoveAt(combatPosition.Target);
+                            _Hands[combatPosition.Attacker ^ 1].Pop(ded);
+                            //_Hands[combatPosition.Attacker ^ 1].slots.RemoveAt(combatPosition.Target);
                             //TODO:We have single DeathRattles for now. Need to implement multiple deathrattles
                             if (ded.buffs.Exists(b => b.What == Buffs.deathRattle))
                                 ProcessDeathRattle(ded, ded.buffs.Find(b => b.What == Buffs.deathRattle), _Hands[combatPosition.Attacker ^ 1], combatPosition.Target);
@@ -350,7 +341,8 @@ namespace BGCompanion
                             _Hands[combatPosition.Attacker].slots.FindAll(m => m.buffs.Exists(b => b.What == Buffs.whenEver && b.Who.HasFlag(Tribe.friendly) && b.Trigger == WheneverTrigger.dies))
                                 .ForEach(d => ProcessWheneverDies(d, d.buffs.Find(b => b.What == Buffs.whenEver && b.Who.HasFlag(Tribe.friendly) && b.Trigger == WheneverTrigger.dies), _Hands[combatPosition.Attacker], combatPosition.AttackQ[combatPosition.Attacker]));
                             Card ded = _Hands[combatPosition.Attacker].slots[combatPosition.AttackQ[combatPosition.Attacker]];
-                            _Hands[combatPosition.Attacker].slots.RemoveAt(combatPosition.AttackQ[combatPosition.Attacker]);
+                            _Hands[combatPosition.Attacker].Pop(ded);
+                            //_Hands[combatPosition.Attacker].slots.RemoveAt(combatPosition.AttackQ[combatPosition.Attacker]);
                             if (ded.buffs.Exists(b => b.What == Buffs.deathRattle))
                                 ProcessDeathRattle(ded, ded.buffs.Find(b => b.What == Buffs.deathRattle), _Hands[combatPosition.Attacker], combatPosition.AttackQ[combatPosition.Attacker]);
                             ProcessReborn(ded, _Hands[combatPosition.Attacker], combatPosition.AttackQ[combatPosition.Attacker]);
@@ -381,24 +373,7 @@ namespace BGCompanion
 
 
         }
-        private static bool SoloMinion(Hand Checking, Hand Against)
-        {
-            bool yep = false;
-            if (!Against.slots.Exists(m => m.buffs.Count > 0))
-            {
-                //The opponent has no buffs left check for card which solo's
-
-                Checking.slots.ForEach(delegate (Card c)
-                {
-                    if (c.Health > Against.slots.Sum(m => m.Attack) && c.Attack >= Against.slots.Max(m => m.Health))
-                    {
-                        yep = true;
-                    }
-                });
-
-            }
-            return yep;
-        }
+        
         private static void ProcessDeathRattle(Card deadCard, Effect e, Hand hand, int target)
         {
             //Summon Minions
@@ -409,7 +384,8 @@ namespace BGCompanion
                 {
                     if (!hand.Full())
                     {
-                        hand.slots.Insert(target, c);
+                        //hand.slots.Insert(target, c);
+                        hand.Insert(target, c);
                     }
                     //TODO: Need to implement whenever summons 
                 });
@@ -490,7 +466,8 @@ namespace BGCompanion
             {
                 //var cardName = hand.slots[target].Name;
                 //hand.slots.RemoveAt(target);
-                hand.slots.Insert(target, new Card(Deck.Cards.Find(m => m.Name == deadMinion.Name)));
+                //hand.slots.Insert(target, new Card(Deck.Cards.Find(m => m.Name == deadMinion.Name)));
+                hand.Insert(target, new Card(Deck.Cards.Find(m => m.Name == deadMinion.Name)));
                 hand.slots[target].Reborn = false;
                 hand.slots[target].Health = 1;
             }

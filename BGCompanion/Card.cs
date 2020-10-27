@@ -2,9 +2,13 @@
 using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.Cryptography;
 
 namespace BGCompanion
 {
+    [Serializable]
     public class Card
     {
         public string Name { get; set; }
@@ -20,7 +24,8 @@ namespace BGCompanion
         public bool Reborn { get; set; }
         public bool Cleave { get; set; }
         public bool Poisonous { get; set; }
-        public Guid guid { get; set; }
+        public int Position { get; set; }
+        //public Guid guid { get; set; }
         public bool Alive { get; set; }
         [JsonConstructor]
         public Card(string name,int attack, int health, int mana, int tier, bool taunt,bool divineshield,bool reborn,bool cleave, bool poisonous, Race tribe)
@@ -53,7 +58,8 @@ namespace BGCompanion
             Reborn = c.Reborn;
             Cleave = c.Cleave;
             Poisonous = c.Poisonous;
-            guid = Guid.NewGuid();
+            Position = c.Position;
+            //guid = Guid.NewGuid();
             Alive = c.Alive;
         }
         public bool HasWhenever(WheneverTrigger wheneverTrigger,Tribe who)
@@ -68,7 +74,19 @@ namespace BGCompanion
         {
             return buffs.Exists(b => b.What == Buffs.deathRattle);
         }
-        
+        private byte[] ToBytes()
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            using (var ms = new MemoryStream())
+            {
+                bf.Serialize(ms, this);
+                return ms.ToArray();
+            }
+        }
+        public byte[] GetHash ()
+        {
+            return SHA256.Create().ComputeHash(ToBytes());
+        }
         public void AddBuff(Effect buff)
         {
             buffs.Add(buff);
